@@ -1,23 +1,25 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
+import Link from "next/link";
 
-// Reusable sidebar item
-function SidebarItem({ icon, label, collapsed, onClick }) {
+function SidebarItem({ icon, label, collapsed, onClick, selected }) {
   return (
     <div
       onClick={onClick}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick?.()}
       role="button"
       tabIndex={0}
-      className="flex items-center gap-3 p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+      className={clsx(
+        "flex items-center gap-3 p-2 rounded-lg text-gray-900 dark:text-white cursor-pointer transition",
+        "hover:bg-gray-100 dark:hover:bg-gray-700",
+        selected ? "bg-gray-100 dark:bg-gray-700" : ""
+      )}
     >
       <span className="w-5 h-5">{icon}</span>
       <span
         className={clsx(
           "transition-all duration-200 overflow-hidden whitespace-nowrap",
-          collapsed
-            ? "opacity-0 max-w-0"
-            : "opacity-100 max-w-xs"
+          collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-xs"
         )}
       >
         {label}
@@ -28,6 +30,7 @@ function SidebarItem({ icon, label, collapsed, onClick }) {
 
 export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) {
   const [patients, setPatients] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -46,57 +49,61 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
   return (
     <aside
       className={clsx(
-        "top-0 left-0 z-40 h-screen pt-20 transition-transform bg-black border-r border-gray-800",
+        "top-0 left-0 z-40 h-screen pt-20 transition-all ease-out duration-300",
         "sm:translate-x-0",
         "-translate-x-full",
-        collapsed ? "" : "translate-x-0"
+        collapsed ? "" : "translate-x-0 bg-black"
       )}
       aria-label="Sidebar"
     >
-      <div className="h-full px-4 pb-6 overflow-y-auto bg-white dark:bg-black font-light text-sm flex flex-col">
-        {/* Collapse Button */}
+      <div className="h-full px-4 pb-6 overflow-y-auto font-light text-sm flex flex-col">
         <div className="mb-2">
-            <button
-                onClick={() => setCollapsed(!collapsed)}
-                className="flex items-center gap-3 p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition w-full"
-                aria-label="Toggle sidebar"
-            >
-                <span className="w-5 h-5 text-gray-500 dark:text-gray-400">
-                {collapsed ? (
-                    <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="#e3e3e3"
-                    strokeWidth={2}
-                    >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                ) : (
-                    <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="#e3e3e3"
-                    strokeWidth={2}
-                    >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                )}
-                </span>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex items-center gap-3 p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition w-full"
+            aria-label="Toggle sidebar"
+          >
+            <span className="w-5 h-5 text-gray-500 dark:text-gray-400">
+              {collapsed ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="#e3e3e3"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="#e3e3e3"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              )}
+            </span>
 
-                {/* Optional label */}
-                {!collapsed && <span className="truncate">Collapse</span>}
-            </button>
+            {!collapsed && <span className="truncate">Collapse</span>}
+          </button>
         </div>
 
-        {/* Static Menu Items */}
         <div className="flex flex-col gap-2">
           <SidebarItem
             icon={
-              <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#e3e3e3">
+              <svg
+                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                height="24"
+                viewBox="0 -960 960 960"
+                width="24"
+                fill="#e3e3e3"
+              >
                 <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z" />
               </svg>
             }
@@ -106,7 +113,14 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
           />
           <SidebarItem
             icon={
-              <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#e3e3e3">
+              <svg
+                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                height="24"
+                viewBox="0 -960 960 960"
+                width="24"
+                fill="#e3e3e3"
+              >
                 <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
               </svg>
             }
@@ -115,16 +129,22 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
           />
         </div>
 
-        {/* Dynamic patient list */}
         {!collapsed && (
           <div className="mt-8">
             <h4 className="mb-2 p-2 text-gray-600 dark:text-gray-300">Chats</h4>
             <ul className="flex flex-col gap-2">
               {patients.map((patient, index) => (
                 <li key={index}>
-                  <div className="flex items-center p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                    <span className="truncate">{patient.Name}</span>
-                  </div>
+                  <Link
+                    href={`/chat/${patient.name}`}
+                    className={clsx(
+                        "flex items-center p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition",
+                        selectedChat === patient.name ? "bg-gray-100 dark:bg-gray-700" : ""
+                    )}
+                    onClick={() => setSelectedChat(patient.name)}
+                    >
+                    <span className="truncate">{patient.name}</span>
+                </Link>
                 </li>
               ))}
             </ul>

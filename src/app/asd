@@ -1,0 +1,68 @@
+'use client';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
+
+export default function ChatPage() {
+  const { chatId } = useParams();
+  const [messages] = useState([
+    {
+      sender: "bot",
+      text: `Patient presents with intermittent chest pain and shortness of breath over the last 3 days. 
+      No history of trauma or previous cardiac issues. Vital signs stable. Recommend ECG and blood work for further evaluation.`,
+    },
+    { sender: "user", text: "It was ganjubassovstvo" },
+    {
+      sender: "bot",
+      text: `Physical examination reveals normal heart sounds with no murmurs. Lungs are clear to auscultation bilaterally. 
+      No peripheral edema observed. Suggest monitoring vitals and follow-up in 24 hours.`,
+    },
+    { sender: "user", text: "okay thanks how can I improve it?" },
+    {
+      sender: "bot",
+      text: `Advise patient to avoid strenuous activity until symptoms resolve. 
+      Encourage hydration and proper medication adherence.`,
+    },
+  ]);
+
+  return (
+    <div className="min-h-screen p-6 text-white font-sans">
+      <h1 className="text-2xl mb-6">Chat with: {chatId}</h1>
+
+      <div className="space-y-6 max-w-3xl mx-auto">
+        {messages.map((msg, i) => {
+          if (msg.sender === "bot") {
+            // Bot messages: plain structured text, no bg, left aligned, line breaks preserved
+            return (
+              <div
+                key={i}
+                className="text-left whitespace-pre-line leading-relaxed max-w-2xl"
+                style={{ whiteSpace: 'pre-line' }}
+              >
+                {msg.text}
+              </div>
+            );
+          } else {
+            // User messages: glassmorphism chat bubble, right aligned
+            return (
+              <div key={i} className="flex justify-end">
+                <div
+                  className="inline-block px-5 py-3 max-w-xs sm:max-w-md md:max-w-lg rounded-3xl text-white"
+                  style={{
+                    background:
+                      'rgba(255, 255, 255, 0.1)', // translucent white
+                    backdropFilter: 'blur(10px)', // blur effect behind
+                    WebkitBackdropFilter: 'blur(10px)', // for Safari
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    boxShadow: '0 4px 30px rgba(255, 255, 255, 0.1)',
+                  }}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            );
+          }
+        })}
+      </div>
+    </div>
+  );
+}
