@@ -1,10 +1,22 @@
-// context/ChatContext.js
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
   const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    async function fetchHistory() {
+      try {
+        const res = await fetch("http://127.0.0.1:5000/chat-history");
+        const data = await res.json();
+        setMessages(data);  // Load saved messages
+      } catch (err) {
+        console.error("Failed to fetch chat history", err);
+      }
+    }
+    fetchHistory();
+  }, []);
 
   const sendMessage = async (messageText) => {
     if (!messageText.trim()) return;
@@ -21,10 +33,7 @@ export function ChatProvider({ children }) {
 
       const data = await res.json();
       if (data.response) {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: data.response },
-        ]);
+        setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
       }
     } catch (error) {
       console.error(error);
