@@ -6,6 +6,7 @@ import Image from "next/image";
 import AskInput from "./AskInput";
 import { ChatProvider, useChat } from "./context/ChatContext";
 import kek from "../../public/Rectangle.png";
+import { useParams } from "next/navigation";
 
 export default function LayoutWrapper({ children }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -58,6 +59,11 @@ export default function LayoutWrapper({ children }) {
 
 function AskInputWrapper() {
   const { sendMessage } = useChat();
+  const { patientId } = useParams();
 
-  return <AskInput onSend={sendMessage} />;
+  const handleSend = (msg) => {
+    sendMessage(patientId, msg);
+  };
+
+  return <AskInput onSend={handleSend} />;
 }

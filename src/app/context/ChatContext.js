@@ -1,47 +1,80 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext } from "react";
 
 const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
-  const [messages, setMessages] = useState([]);
+  const [messagesByPatient, setMessagesByPatient] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchHistory() {
-      try {
-        const res = await fetch("http://127.0.0.1:5000/chat-history");
-        const data = await res.json();
-        setMessages(data);  // Load saved messages
-      } catch (err) {
-        console.error("Failed to fetch chat history", err);
-      }
+  async function loadHistory(patientId) {
+    if (!patientId) return;
+
+    if (messagesByPatient[patientId]) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/chat-history/${patientId}`);
+      if (!res.ok) throw new Error("Failed to fetch chat history");
+
+      const data = await res.json();
+
+      setMessagesByPatient((prev) => ({
+        ...prev,
+        [patientId]: data || [],
+      }));
+    } catch (err) {
+      console.error("Failed to fetch chat history", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    fetchHistory();
-  }, []);
+  }
 
-  const sendMessage = async (messageText) => {
+  async function sendMessage(patientId, messageText) {
     if (!messageText.trim()) return;
 
     const userMessage = { role: "user", content: messageText };
-    setMessages((prev) => [...prev, userMessage]);
+
+    setMessagesByPatient((prev) => ({
+      ...prev,
+      [patientId]: [...(prev[patientId] || []), userMessage],
+    }));
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/chat", {
+      const res = await fetch(`http://127.0.0.1:5000/chat/${patientId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: messageText }),
       });
 
       const data = await res.json();
+
       if (data.response) {
-        setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
+        const assistantMessage = { role: "assistant", content: data.response };
+        setMessagesByPatient((prev) => ({
+          ...prev,
+          [patientId]: [...(prev[patientId] || []), assistantMessage],
+        }));
       }
     } catch (error) {
-      console.error(error);
+      console.error("Failed to send message", error);
+      setMessagesByPatient((prev) => ({
+        ...prev,
+        [patientId]: [
+          ...(prev[patientId] || []),
+          { role: "system", content: "⚠️ Failed to send message." },
+        ],
+      }));
     }
-  };
+  }
 
   return (
-    <ChatContext.Provider value={{ messages, sendMessage }}>
+    <ChatContext.Provider
+      value={{ messagesByPatient, loadHistory, sendMessage, loading, error }}
+    >
       {children}
     </ChatContext.Provider>
   );

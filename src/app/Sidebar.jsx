@@ -133,18 +133,18 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
           <div className="mt-8">
             <h4 className="mb-2 p-2 text-gray-600 dark:text-gray-300">Chats</h4>
             <ul className="flex flex-col gap-2">
-              {patients.map((patient, index) => (
-                <li key={index}>
+              {patients.map((patient) => (
+                <li key={patient.id}>
                   <Link
-                    href={`/chat/${patient.name}`}
+                    href={`/chat/${patient.id}`}
                     className={clsx(
                         "flex items-center p-2 rounded-lg text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition",
-                        selectedChat === patient.name ? "bg-gray-100 dark:bg-gray-700" : ""
+                        selectedChat === patient.id ? "bg-gray-100 dark:bg-gray-700" : ""
                     )}
-                    onClick={() => setSelectedChat(patient.name)}
-                    >
+                    onClick={() => setSelectedChat(patient.id)}
+                  >
                     <span className="truncate">{patient.name}</span>
-                </Link>
+                  </Link>
                 </li>
               ))}
             </ul>
