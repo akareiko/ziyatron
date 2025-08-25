@@ -16,7 +16,7 @@ export default function ChatPage() {
   }, [patientId]);
 
   return (
-    <div className="min-h-screen p-6 text-white font-sans">
+    <div className="min-h-screen p-6 text-black font-sans">
 
       {loading && <p>Loading chat history...</p>}
       {error && <p className="text-red-400">Error: {error}</p>}
@@ -25,14 +25,14 @@ export default function ChatPage() {
         {messages.map((msg, i) => {
           if (msg.role === "assistant") {
             return (
-              <div key={i} className="text-left whitespace-pre-line leading-relaxed max-w-2xl">
+              <div key={i} className="text-left px-5 py-3 bg-white/40 shadow-lg rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words break-all overflow-x-hidden">
                 {msg.content}
               </div>
             );
           } else if (msg.role === "user") {
             return (
               <div key={i} className="flex justify-end">
-                <div className="inline-block px-5 py-3 max-w-xs sm:max-w-md md:max-w-lg rounded-3xl text-white bg-white/10 backdrop-blur border border-white/20">
+                <div className="inline-block px-4 py-2 max-w-xs sm:max-w-md md:max-w-lg rounded-2xl text-black bg-white/40 shadow-lg reak-words break-all overflow-x-hidden">
                   {msg.content}
                 </div>
               </div>

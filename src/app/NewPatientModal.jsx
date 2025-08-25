@@ -67,7 +67,7 @@ export default function NewPatientModal({ isOpen, onClose }) {
     <div
       className="fixed inset-0 flex items-center justify-center z-50 transition-opacity"
       style={{
-        background: `rgba(0,0,0,0.7)`,
+        background: `rgba(0,0,0,0.6)`,
         opacity: overlayOpacity,
         transition: `opacity ${transitionDuration}ms`,
       }}
@@ -76,10 +76,8 @@ export default function NewPatientModal({ isOpen, onClose }) {
       aria-labelledby="modal-title"
     >
       <div
-        className="w-full max-w-md p-8 rounded-3xl"
+        className="w-full max-w-md p-8 rounded-3xl bg-white/20"
         style={{
-          background:
-            "rgba(255, 255, 255, 0.1)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           border: "1.5px solid rgba(255, 255, 255, 0.18)",
@@ -177,7 +175,7 @@ export default function NewPatientModal({ isOpen, onClose }) {
             </p>
           </div>
 
-          <div className="flex justify-between items-center mt-3">
+          <div className="flex justify-center items-center mt-3">
             <span className="text-sm text-green-400">{status}</span>
             <button
               type="submit"

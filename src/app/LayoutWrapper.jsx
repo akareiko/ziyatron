@@ -5,8 +5,9 @@ import NewPatientModal from "./NewPatientModal";
 import Image from "next/image";
 import AskInput from "./AskInput";
 import { ChatProvider, useChat } from "./context/ChatContext";
-import kek from "../../public/Rectangle.png";
+import kek from "../../public/amextwo.png";
 import { useParams } from "next/navigation";
+import '../styles/globals.css';
 
 export default function LayoutWrapper({ children }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -14,16 +15,20 @@ export default function LayoutWrapper({ children }) {
 
   return (
     <ChatProvider>
-      <div>
+      <div className="relative min-h-screen text-black">
+        {/* Background image with subtle overlay */}
         <Image
           src={kek}
           width={500}
           height={500}
-          alt="Picture of the author"
-          className="z-0 absolute top-0 left-0 w-full h-full object-cover opacity-10"
+          alt="Background"
+          className="z-0 absolute top-0 left-0 w-full h-full object-cover opacity-70"
         />
+        <div className="absolute inset-0 bg-white/5 backdrop-blur-md z-0" />
 
-        <div className="flex flex-row bg-white/2 h-screen">
+        {/* Layout container */}
+        <div className="relative z-10 flex flex-row h-screen">
+          {/* Sidebar */}
           <div
             className={`transition-all duration-300 ${
               collapsed ? "w-[5%]" : "w-[18%]"
@@ -36,17 +41,25 @@ export default function LayoutWrapper({ children }) {
             />
           </div>
 
+          {/* Main content */}
           <div
-            className={`transition-all duration-300 ${
+            className={`transition-all duration-300 relative ${
               collapsed ? "w-[95%]" : "w-[82%]"
-            }`}
+            } flex flex-col`}
           >
-            <NewPatientModal isOpen={showModal} onClose={() => setShowModal(false)} />
+            <NewPatientModal
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+            />
 
             <div className="flex flex-col justify-between h-full">
-              <div className="p-4 overflow-auto">{children}</div>
+              {/* Chat content area */}
+              <div className="p-6 overflow-auto m-4 bg-white/25 backdrop-blur-lg shadow-xl rounded-3xl" style={{ paddingBottom: '100px' }}>
+                {children}
+              </div>
 
-              <div className="flex flex-row justify-center p-10">
+              {/* Input area */}
+              <div className="flex flex-row justify-center w-full p-6 absolute bottom-0 z-10">
                 <AskInputWrapper />
               </div>
             </div>

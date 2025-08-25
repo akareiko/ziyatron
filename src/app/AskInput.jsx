@@ -58,7 +58,7 @@ export default function AskInput({ onSend, onUploadClick }) {
 
   return (
     <div
-      className={`w-full max-w-3xl mx-auto bg-white/10 backdrop-blur-sm border border-white/20 overflow-hidden`}
+      className={`w-full max-w-3xl mx-auto bg-white/40 backdrop-blur-xl shadow-xl border border-white/20 overflow-hidden`}
       style={{
         borderRadius: isBar ? "9999px" : "1rem",
         padding: isBar ? "0.5rem 0.75rem" : "0.75rem",
@@ -73,13 +73,13 @@ export default function AskInput({ onSend, onUploadClick }) {
         {isBar && (
           <button
             onClick={onUploadClick}
-            className="p-2 hover:bg-white/10 rounded-lg transition"
+            className="p-2 hover:bg-black/10 rounded-full transition"
           >
             <svg
               width="20"
               height="20"
               fill="none"
-              stroke="white"
+              stroke="black"
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
@@ -95,9 +95,15 @@ export default function AskInput({ onSend, onUploadClick }) {
         <textarea
           ref={textareaRef}
           value={inputValue}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           onChange={handleChange}
           placeholder="Type or drop a file..."
-          className="flex-1 resize-none bg-transparent outline-none text-white placeholder-gray-400 scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent"
+          className="flex-1 resize-none bg-transparent outline-none text-black placeholder-black scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent"
           style={{
             maxHeight: "150px",
             minHeight: isBar ? "1.5rem" : "2rem",
@@ -108,13 +114,13 @@ export default function AskInput({ onSend, onUploadClick }) {
         {isBar && (
           <button
             onClick={handleSend}
-            className="p-2 hover:bg-white/10 rounded-lg transition"
+            className="p-2 hover:bg-black/10 rounded-full transition"
           >
             <svg
               width="20"
               height="20"
               fill="none"
-              stroke="white"
+              stroke="black"
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
@@ -132,13 +138,13 @@ export default function AskInput({ onSend, onUploadClick }) {
         <div className="flex justify-between items-center mt-1 px-1">
           <button
             onClick={onUploadClick}
-            className="p-2 hover:bg-white/10 rounded-lg transition"
+            className="p-2 hover:bg-black/10 rounded-full transition"
           >
             <svg
               width="20"
               height="20"
               fill="none"
-              stroke="white"
+              stroke="black"
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
@@ -151,13 +157,13 @@ export default function AskInput({ onSend, onUploadClick }) {
           </button>
           <button
             onClick={handleSend}
-            className="p-2 hover:bg-white/10 rounded-lg transition"
+            className="p-2 hover:bg-black/10 rounded-full transition"
           >
             <svg
               width="20"
               height="20"
               fill="none"
-              stroke="white"
+              stroke="black"
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
