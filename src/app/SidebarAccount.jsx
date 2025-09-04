@@ -1,0 +1,145 @@
+'use client';
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "./context/AuthContext";
+import { createPortal } from "react-dom";
+
+export default function SidebarAccount() {
+  const { user, logout } = useAuth();
+  const [showMenu, setShowMenu] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const menuRef = useRef(null);
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = "http://localhost:3000";
+  };
+
+  if (!user)
+    return (
+      <span className="cursor-pointer" onClick={() => alert("Please login")}>
+        Login
+      </span>
+    );
+
+  const initial = (user.name || user.email || "U")[0].toUpperCase();
+  const colorHash = Array.from(user.email || "user").reduce(
+    (acc, char) => acc + char.charCodeAt(0),
+    0
+  );
+  const colors = ["#f87171", "#60a5fa", "#34d399", "#facc15", "#a78bfa"];
+  const bgColor = colors[colorHash % colors.length];
+
+  // Close dropdown on Escape
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setShowMenu(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [showMenu]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    window.addEventListener("mousedown", handleClickOutside);
+    return () => window.removeEventListener("mousedown", handleClickOutside);
+  }, [showMenu]);
+
+  return (
+    <>
+      {/* Account button */}
+      <div className="relative">
+        <div
+          onClick={() => setShowMenu(!showMenu)}
+          className="flex items-center gap-2 text-sm rounded-2xl cursor-pointer m-2 p-2 rounded hover:bg-gray-100 transition"
+        >
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold"
+            style={{ backgroundColor: bgColor }}
+          >
+            {initial}
+          </div>
+          <span>{user.name || user.email}</span>
+        </div>
+
+        {/* Dropdown menu */}
+        {showMenu && (
+          <ul
+            ref={menuRef}
+            className="absolute bottom-full left-1/2 w-60 bg-white rounded-xl overflow-hidden z-50 transform -translate-x-1/2 py-2 shadow-lg"
+          >
+            <li className="flex items-center gap-2 px-4 py-2 text-gray-500 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1">
+              {user.email}
+            </li>
+            <li
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1 cursor-pointer"
+              onClick={() => alert("Settings clicked")}
+            >
+              Settings
+            </li>
+            <li
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1 cursor-pointer"
+              onClick={() => alert("Help clicked")}
+            >
+              Help
+            </li>
+            <li>
+              <hr className="border-t border-gray-300 mx-4 my-1" />
+            </li>
+            <li
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1 cursor-pointer"
+              onClick={() => setConfirmLogout(true)}
+            >
+              Log out
+            </li>
+          </ul>
+        )}
+      </div>
+
+      {/* Logout confirmation popup */}
+      {confirmLogout &&
+        createPortal(
+          <div
+            className="fixed inset-0 flex items-center justify-center z-50 bg-gray-100/30 backdrop-blur-[0.5px] text-black"
+            onClick={() => setConfirmLogout(false)}
+          >
+            <div
+              className="w-full max-w-sm p-6 rounded-2xl bg-white flex flex-col gap-4 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setConfirmLogout(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10"
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
+              <h2 className="text-xl font-light mb-2">Confirm Logout</h2>
+              <p>Are you sure you want to log out?</p>
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => setConfirmLogout(false)}
+                  className="px-4 py-2 rounded border hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                >
+                  Yes, log out
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+    </>
+  );
+}

@@ -209,7 +209,13 @@ function EphemeralAskInput({ onFirstMessage }) {
       )}
 
       {/* Input fixed at bottom after first message */}
-      <div className={messages.length > 0 ? "fixed bottom-2 left-1/2 transform -translate-x-1/2 w-full max-w-3xl transition-all duration-300" : ""}>
+      <div
+        className={`w-full max-w-3xl mx-auto transition-[bottom] duration-500 ${
+          messages.length > 0
+            ? "fixed bottom-2 left-1/2 transform -translate-x-1/2"
+            : "relative bottom-0"
+        }`}
+      >
         <AskInput
           onSend={(payload) => sendMessage(payload.message)}
           onUploadClick={() => {}}
@@ -239,64 +245,75 @@ export default function Page({ children }) {
 
   return (
     <div
-      className={`relative min-h-screen transition-colors duration-500 ${
-        animatedMode ? "text-gray-200 bg-[#121212]" : "text-black bg-gray-100"
+  className={`relative min-h-screen transition-colors duration-500 ${
+    animatedMode ? "text-gray-200 bg-[#121212]" : "text-black bg-gray-100"
+  }`}
+>
+  {animatedMode && <SplineBackground />}
+
+  {/* Top-left Z toggle & top-right Sign In (always fixed) */}
+  <div className="fixed top-4 left-4 z-50">
+    <div
+      onClick={() => setAnimatedMode(!animatedMode)}
+      className={`w-9 h-9 rounded-full flex items-center justify-center font-bold transition-colors duration-300 ${
+        animatedMode
+          ? "bg-[#e5e5d9]/70 text-black"
+          : "bg-black text-white border hover:bg-gray-200"
       }`}
     >
-      {animatedMode && <SplineBackground />}
-
-      <div className="fixed top-4 left-4 z-50 flex items-center gap-2 cursor-pointer">
-        <div
-          onClick={() => setAnimatedMode(!animatedMode)}
-          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors duration-300 ${
-            animatedMode
-              ? "bg-[#e5e5d9]/70 text-black"
-              : "bg-black text-white border hover:bg-gray-200"
-          }`}
-        >
-          Z
-        </div>
-      </div>
-
-      <div className="fixed top-4 right-4 z-50">
-        <button
-          onClick={() => setShowAuth(true)}
-          className={`px-4 py-2 rounded-full transition-colors duration-300 ${
-            animatedMode
-              ? "bg-[#e5e5d9]/70 text-black"
-              : "bg-black text-white"
-          }`}
-        >
-          Sign In
-        </button>
-      </div>
-
-      {showAuth && <AuthPopup onClose={() => setShowAuth(false)} animatedMode={animatedMode} />}
-
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 space-y-6">
-        {/* Title and disclaimer only show before first message */}
-        {!firstMessageSent && (
-          <>
-            <p
-              className={`text-4xl md:text-5xl font-bold ${
-                animatedMode ? "text-[#e5e5d9]" : "text-black"
-              }`}
-            >
-              Ziyatron
-            </p>
-            <p
-              className={`text-xs md:text-base transition-colors duration-300 ${
-                animatedMode ? "text-[#e5e5d9]/70" : "text-gray-600"
-              }`}
-            >
-              Ziyatron can make mistakes—please double-check important info.
-            </p>
-          </>
-        )}
-
-        {/* Ephemeral chat input + history */}
-        <EphemeralAskInput onFirstMessage={() => { setFirstMessageSent(true); setAnimatedMode(false); }} />
-      </div>
+      Z
     </div>
+  </div>
+
+  <div className="fixed top-4 right-4 z-50">
+    <button
+      onClick={() => setShowAuth(true)}
+      className={`px-4 py-2 rounded-full transition-colors duration-300 ${
+        animatedMode ? "bg-[#e5e5d9]/70 text-black" : "bg-black text-white"
+      }`}
+    >
+      Sign In
+    </button>
+  </div>
+
+  {showAuth && <AuthPopup onClose={() => setShowAuth(false)} animatedMode={animatedMode} />}
+
+  {/* Title */}
+  <div
+    className={`absolute left-1/2 transform -translate-x-1/2 transition-all duration-500 ${
+      firstMessageSent
+        ? "top-4 text-4xl md:text-3xl" // slide to top
+        : "top-1/2 -translate-y-1/2 text-4xl md:text-5xl" // center
+    } font-bold text-center ${
+      animatedMode ? "text-[#e5e5d9]" : "text-black"
+    }`}
+  >
+    Ziyatron
+  </div>
+
+  {/* Chat input + annotation */}
+  <div
+    className={`absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-500 px-4 w-full max-w-3xl ${
+      firstMessageSent ? "bottom-10" : "top-1/2 translate-y-12" // below title initially
+    }`}
+  >
+    <EphemeralAskInput
+      onFirstMessage={() => {
+        setFirstMessageSent(true);
+        setAnimatedMode(false);
+      }}
+    />
+    <p
+      className={`text-xs md:text-base text-center transition-all duration-500 ${
+        animatedMode ? "text-[#e5e5d9]/70" : "text-gray-600"
+      }`}
+    >
+      {firstMessageSent ?
+        //  "Ziyatron can make mistakes — please double-check important info." 
+        ""
+        : "Please refer to terms of service"}
+    </p>
+  </div>
+</div>
   );
 }

@@ -3,6 +3,7 @@ import { useState, useEffect, memo } from "react";
 import clsx from "clsx";
 import Link from "next/link";
 import { useAuth } from "./context/AuthContext";
+import SidebarAccount from "./SidebarAccount";
 
 // ---------------------
 // Debounce hook
@@ -26,11 +27,11 @@ const SidebarItem = memo(({ icon, label, collapsed, onClick, selected }) => (
     role="button"
     tabIndex={0}
     className={clsx(
-      "flex items-center p-1.5 rounded-lg text-black cursor-pointer transition-colors duration-200 hover:bg-white/40 w-full",
+      "flex items-center p-1.5 rounded-lg text-black cursor-pointer transition-colors duration-200 hover:bg-black/10 w-full",
       selected && "bg-white/40 shadow"
     )}
   >
-    <span className="w-6 h-5 flex justify-center items-center flex-shrink-0">{icon}</span>
+    <span className="w-5 h-5 flex justify-center items-center flex-shrink-0">{icon}</span>
     <span
       className={clsx(
         "whitespace-nowrap overflow-hidden transition-all duration-200",
@@ -50,11 +51,11 @@ function SidebarHeader({ collapsed, setCollapsed }) {
     <div className="mb-2">
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center p-1.5 rounded-lg text-black hover:bg-white/40 cursor-pointer transition-colors duration-200 w-full"
+        className="flex items-center p-1.5 rounded-lg text-black hover:bg-black/10 cursor-pointer transition-colors duration-200 w-full"
         aria-label="Toggle sidebar"
         aria-pressed={collapsed}
       >
-        <span className="w-6 h-5 flex justify-center items-center flex-shrink-0 text-gray-600">
+        <span className="w-5 h-5 flex justify-center items-center flex-shrink-0 text-gray-600">
           {collapsed ? (
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -79,7 +80,7 @@ function SidebarHeader({ collapsed, setCollapsed }) {
 const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }) => (
   <div className="mt-8">
     <h4 className={clsx(
-      "mb-2 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap",
+      "mb-1.5 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap",
       collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
     )}>
       Patients
@@ -97,7 +98,7 @@ const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }
           >
             <span className={clsx(
               "whitespace-nowrap overflow-hidden transition-all duration-200",
-              collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100 ml-2"
+              collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
             )}>
               {patient.name}
             </span>
@@ -111,22 +112,7 @@ const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }
 // ---------------------
 // SidebarAccount
 // ---------------------
-function SidebarAccount({ onClick }) {
-  const { user, logout } = useAuth();
-  return (
-    <div onClick={onClick} className="cursor-pointer">
-      {user ? (
-        <div className="flex items-center gap-2">
-          <img src={user.photoURL || "/default.png"} className="w-8 h-8 rounded-full" />
-          <span>{user.name || user.email}</span>
-          <button onClick={logout} className="ml-2 text-sm text-red-500 hover:underline">Logout</button>
-        </div>
-      ) : (
-        <span>Login</span>
-      )}
-    </div>
-  );
-}
+<SidebarAccount />
 
 // ---------------------
 // AuthPopup
@@ -166,17 +152,23 @@ function AuthPopup({ setShowAuth }) {
 // SearchPopup component
 // ---------------------
 function SearchPopup({ searchTerm, setSearchTerm, searchResults, setSearchResults, loadingSearch, setShowSearch, setSelectedChat }) {
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setShowSearch(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [setShowSearch]);
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
-      onKeyDown={(e) => e.key === "Escape" && setShowSearch(false)}
       tabIndex={-1}
     >
       <div className="w-full max-w-2xl bg-white/30 backdrop-blur-xl p-8 rounded-2xl shadow-2xl h-[80vh] flex flex-col relative">
         {/* Close button */}
         <button
           onClick={() => setShowSearch(false)}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10 transition"
+          className="absolute top-2 right-2 p-2 rounded-full hover:bg-black/10 transition"
           aria-label="Close search"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -189,7 +181,7 @@ function SearchPopup({ searchTerm, setSearchTerm, searchResults, setSearchResult
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search patient chats..."
-          className="w-full p-3 rounded-lg bg-white/60 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
+          className="w-full p-3 mt-4 rounded-lg border text-black placeholder-gray-700 focus:outline-none"
         />
 
         <div className="mt-6 flex-1 overflow-y-auto space-y-2">
@@ -220,22 +212,6 @@ function SearchPopup({ searchTerm, setSearchTerm, searchResults, setSearchResult
       </div>
     </div>
   );
-}
-
-// ---------------------
-// Authenticated fetch helper
-// ---------------------
-async function authFetch(url, options = {}, token) {
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      ...(options.headers || {}),
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  if (res.status === 401) throw new Error("Unauthorized");
-  return res.json();
 }
 
 // ---------------------
@@ -291,24 +267,24 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
     <>
       <aside
         className={clsx(
-          "top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden",
-          collapsed ? "" : "translate-x-0 bg-[#243c5a]/15 backdrop-blur-md shadow-lg"
+          "top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white/40 backdrop-blur-2xl",
+          collapsed ? "" : "translate-x-0 bg-[#243c5a]/15 backdrop-blur-md shadow-lg rounded-2xl"
         )}
         aria-label="Sidebar"
       >
-        <div className="h-full px-4 overflow-y-auto text-sm flex flex-col">
+        <div className="h-full px-2 overflow-y-auto text-sm flex flex-col">
           <SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
 
           {/* Menu */}
           <div className="flex flex-col gap-2">
             <SidebarItem
-              icon={<span className="w-5 h-5 bg-gray-300 rounded-full" />}
+              icon={<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000ff"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>}
               label="New patient"
               collapsed={collapsed}
               onClick={onNewPatientClick}
             />
             <SidebarItem
-              icon={<span className="w-5 h-5 bg-gray-300 rounded-full" />}
+              icon={<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000ff"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93ZM320-320v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T663-540L443-320H320Zm300-263-37-37 37 37ZM380-380h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg>}
               label="Search chats"
               collapsed={collapsed}
               onClick={() => setShowSearch(true)}

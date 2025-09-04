@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import LayoutWrapper from "./LayoutWrapper";
+import { useChat } from "./context/ChatContext";
 import AskInput from "./AskInput";
-import SplineBackground from "./Splinebg";
-import { useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
+import SplineBackground from "./Splinebg"; // Client-only Spline component
 
 // ---------------------
-// Auth Popup (unchanged)
+// Auth Popup
+// ---------------------
 function AuthPopup({ onClose, animatedMode }) {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
@@ -132,101 +134,29 @@ function AuthPopup({ onClose, animatedMode }) {
 }
 
 // ---------------------
-// Ephemeral AskInput Wrapper with bottom-fixed behavior
-function EphemeralAskInput({ onFirstMessage }) {
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    if (messages.length > 0) scrollToBottom();
-  }, [messages]);
-
-  const sendMessage = async (message) => {
-    if (!message.trim()) return;
-    if (messages.length === 0) onFirstMessage?.();
-
-    setMessages((prev) => [...prev, { role: "user", content: message }]);
-    setLoading(true);
-
-    try {
-      const res = await fetch("http://127.0.0.1:5000/anon-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: "ephemeral", message }),
-      });
-      const data = await res.json();
-      if (data.response) {
-        setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
-      }
-    } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "system", content: "⚠️ Failed to send message." },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+// AskInputWrapper
+// ---------------------
+function AskInputWrapper() {
+  const { sendMessage } = useChat();
+  const { patientId } = useParams();
 
   return (
-    <div className="flex flex-col w-full max-w-3xl mx-auto">
-      {/* Ephemeral chat history */}
-      {messages.length > 0 && (
-        <div className="flex flex-col gap-4 mb-2 pb-24">
-          {messages.map((msg, i) => {
-            if (msg.role === "assistant") {
-              return (
-                <div
-                  key={i}
-                  className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words break-all overflow-x-hidden"
-                >
-                  {msg.content}
-                </div>
-              );
-            } else if (msg.role === "user") {
-              return (
-                <div key={i} className="flex justify-end">
-                  <div className="inline-block px-4 py-2 max-w-xs sm:max-w-md md:max-w-lg rounded-2xl text-black bg-[#243c5a]/15 break-words break-all overflow-x-hidden">
-                    {msg.content}
-                  </div>
-                </div>
-              );
-            } else {
-              return (
-                <div key={i} className="text-center text-sm text-red-400 italic">
-                  {msg.content}
-                </div>
-              );
-            }
-          })}
-          <div ref={messagesEndRef}></div>
-        </div>
-      )}
-
-      {/* Input fixed at bottom after first message */}
-      <div className={messages.length > 0 ? "fixed bottom-2 left-1/2 transform -translate-x-1/2 w-full max-w-3xl transition-all duration-300" : ""}>
-        <AskInput
-          onSend={(payload) => sendMessage(payload.message)}
-          onUploadClick={() => {}}
-          disabled={loading}
-        />
-      </div>
-    </div>
+    <AskInput
+      onSend={(payload) => sendMessage(patientId, payload)}
+      onUploadClick={() => {}}
+    />
   );
 }
 
 // ---------------------
 // Main Page Component
+// ---------------------
 export default function Page({ children }) {
   const { user, loading } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
+
+  // Start in Spline mode
   const [animatedMode, setAnimatedMode] = useState(true);
-  const [firstMessageSent, setFirstMessageSent] = useState(false);
 
   if (loading)
     return (
@@ -243,8 +173,10 @@ export default function Page({ children }) {
         animatedMode ? "text-gray-200 bg-[#121212]" : "text-black bg-gray-100"
       }`}
     >
+      {/* Conditional Spline background */}
       {animatedMode && <SplineBackground />}
 
+      {/* Top-left logo (acts as toggle) */}
       <div className="fixed top-4 left-4 z-50 flex items-center gap-2 cursor-pointer">
         <div
           onClick={() => setAnimatedMode(!animatedMode)}
@@ -258,6 +190,7 @@ export default function Page({ children }) {
         </div>
       </div>
 
+      {/* Top-right Sign In button */}
       <div className="fixed top-4 right-4 z-50">
         <button
           onClick={() => setShowAuth(true)}
@@ -273,29 +206,30 @@ export default function Page({ children }) {
 
       {showAuth && <AuthPopup onClose={() => setShowAuth(false)} animatedMode={animatedMode} />}
 
+      {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 space-y-6">
-        {/* Title and disclaimer only show before first message */}
-        {!firstMessageSent && (
-          <>
-            <p
-              className={`text-4xl md:text-5xl font-bold ${
-                animatedMode ? "text-[#e5e5d9]" : "text-black"
-              }`}
-            >
-              Ziyatron
-            </p>
-            <p
-              className={`text-xs md:text-base transition-colors duration-300 ${
-                animatedMode ? "text-[#e5e5d9]/70" : "text-gray-600"
-              }`}
-            >
-              Ziyatron can make mistakes—please double-check important info.
-            </p>
-          </>
-        )}
+        {/* Title */}
+        <p
+          className={`text-4xl md:text-5xl font-bold ${
+            animatedMode ? "text-[#e5e5d9]" : "text-black"
+          }`}
+        >
+          Ziyatron
+        </p>
 
-        {/* Ephemeral chat input + history */}
-        <EphemeralAskInput onFirstMessage={() => { setFirstMessageSent(true); setAnimatedMode(false); }} />
+        {/* AskInput */}
+        <div className="w-full max-w-3xl">
+          <AskInputWrapper />
+        </div>
+
+        {/* Disclaimer */}
+        <p
+          className={`text-xs md:text-base transition-colors duration-300 ${
+            animatedMode ? "text-[#e5e5d9]/70" : "text-gray-600"
+          }`}
+        >
+          Ziyatron can make mistakes—please double-check important info.
+        </p>
       </div>
     </div>
   );

@@ -1,54 +1,18 @@
 import { useState, useEffect } from "react";
 
-export default function NewPatientModal({ isOpen, onClose }) {
+export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [condition, setCondition] = useState("");
-  const [status, setStatus] = useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setStatus("No auth token found. Please login.");
-      return;
-    }
-
-    try {
-      const res = await fetch('http://127.0.0.1:5000/add-patient', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // <-- token added
-        },
-        body: JSON.stringify({ name, age, condition }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setStatus("Saved!");
-        setName("");
-        setAge("");
-        setCondition("");
-        setTimeout(() => {
-          setStatus(null);
-          onClose();
-        }, 1000);
-      } else {
-        setStatus(data.error || "Error");
-      }
-    } catch (err) {
-      console.error(err);
-      setStatus("Network error");
-    }
-  };
-
+  const [status, setStatus] = useState("");
   const [visible, setVisible] = useState(isOpen);
-  const [overlayOpacity, setOverlayOpacity] = useState(isOpen ? 1 : 0);
-  const transitionDuration = 150; // ms
 
+  // Open/close modal based on isOpen prop
+  useEffect(() => {
+    setVisible(isOpen);
+  }, [isOpen]);
+
+  // Close on Escape
   useEffect(() => {
     if (!visible) return;
     const onKeyDown = (e) => {
@@ -58,120 +22,88 @@ export default function NewPatientModal({ isOpen, onClose }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [visible]);
 
-  useEffect(() => {
-    if (isOpen) {
-      setVisible(true);
-      setTimeout(() => setOverlayOpacity(1), 10);
-    } else {
-      setOverlayOpacity(0); 
-      setTimeout(() => setVisible(false), transitionDuration); 
-    }
-  }, [isOpen]);
-
   const handleClose = () => {
-    setOverlayOpacity(0);
-    setTimeout(() => {
-      setVisible(false);
-      onClose();
-    }, transitionDuration);
+    setVisible(false);
+    if (onClose) onClose();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setStatus("No auth token found.");
+      return;
+    }
+    try {
+      const res = await fetch("http://127.0.0.1:5000/add-patient", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name, age, condition }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatus("Saved!");
+        setName(""); setAge(""); setCondition("");
+        setTimeout(() => {
+          setStatus(""); handleClose();
+        }, 1000);
+      } else {
+        setStatus(data.error || "Error saving patient");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("Network error");
+    }
   };
 
   if (!visible) return null;
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center z-50 transition-opacity"
-      style={{
-        background: `rgba(0,0,0,0.6)`,
-        opacity: overlayOpacity,
-        transition: `opacity ${transitionDuration}ms`,
-      }}
-      aria-modal="true"
-      role="dialog"
-      aria-labelledby="modal-title"
-    >
-      <div
-        className="w-full max-w-md p-8 rounded-3xl bg-white/20"
-        style={{
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          border: "1.5px solid rgba(255, 255, 255, 0.18)",
-          boxShadow:
-            "0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 0 10px 1px rgba(255, 255, 255, 0.1)",
-          color: "rgba(245, 245, 245, 0.9)",
-          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        }}
-      >
-        <div className="flex justify-between items-center mb-6">
-          <h2
-            id="modal-title"
-            className="text-2xl tracking-wide"
-            style={{ color: "rgba(255, 255, 255, 0.9)", fontWeight: 500 }}
-          >
-            New Patient
-          </h2>
-          <button
-            onClick={handleClose}
-            className="text-white hover:text-red-400 text-3xl leading-none transition"
-            aria-label="Close modal"
-            tabIndex={0}
-          >
-            ✖
-          </button>
-        </div>
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="w-full max-w-2xl p-6 rounded-2xl bg-white/30 backdrop-blur-xl shadow-2xl flex flex-col relative">
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10"
+          aria-label="Close modal"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-        <form className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
-          <div>
-            <input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full rounded-xl px-4 py-3 bg-transparent border border-[rgba(255,255,255,0.3)] text-inherit placeholder-[rgba(255,255,255,0.6)] focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60 transition caret-white"
-            />
-            <p className="mt-1 text-xs text-[rgba(255,255,255,0.5)] select-none">
-              Enter full patient name.
-            </p>
-          </div>
+        <h2 className="text-xl font-light mb-4">New Patient</h2>
 
-          <div>
-            <input
-              type="number"
-              placeholder="Age"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              required
-              inputMode="numeric"
-              pattern="[0-9]*"
-              className="w-full rounded-xl px-4 py-3 bg-transparent border border-[rgba(255,255,255,0.3)] text-white placeholder-[rgba(255,255,255,0.6)] focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60 transition caret-white appearance-none"
-              style={{ MozAppearance: "textfield" }}
-              autoComplete="off"
-            />
-            <p className="mt-1 text-xs text-[rgba(255,255,255,0.5)] select-none">
-              Type age using keyboard; no arrows.
-            </p>
-          </div>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full p-3 rounded-lg border text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
+          />
+          <input
+            type="number"
+            placeholder="Age"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            required
+            className="w-full p-3 rounded-lg border text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
+          />
+          <textarea
+            placeholder="Condition"
+            value={condition}
+            onChange={(e) => setCondition(e.target.value)}
+            rows={4}
+            required
+            className="w-full p-3 rounded-lg border text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30 resize-none"
+          />
 
-          <div>
-            <textarea
-              placeholder="Condition"
-              value={condition}
-              onChange={(e) => setCondition(e.target.value)}
-              required
-              rows={5}
-              className="w-full rounded-xl px-4 py-3 bg-transparent border border-[rgba(255,255,255,0.3)] text-white placeholder-[rgba(255,255,255,0.6)] focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60 transition caret-white resize-none"
-            />
-            <p className="mt-1 text-xs text-[rgba(255,255,255,0.5)] select-none">
-              Brief description of patient's condition.
-            </p>
-          </div>
-
-          <div className="flex justify-center items-center mt-3">
-            <span className="text-sm text-green-400">{status}</span>
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-sm text-green-600">{status}</span>
             <button
               type="submit"
-              className="rounded-xl px-6 py-3 bg-gradient-to-r from-[rgba(255,255,255,0.15)] to-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.3)] text-white shadow-md hover:bg-gradient-to-r hover:from-[rgba(255,255,255,0.3)] hover:to-[rgba(255,255,255,0.1)] transition backdrop-filter backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+              className="px-6 py-2 rounded-lg bg-black/70 text-white hover:bg-black/90"
             >
               Save
             </button>

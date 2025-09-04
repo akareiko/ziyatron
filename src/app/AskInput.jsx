@@ -120,7 +120,7 @@ export default function AskInput({ onSend, onUploadClick }) {
 
   return (
     <div
-      className="w-full max-w-3xl mx-auto bg-white/40 backdrop-blur-xl border border-black/20 overflow-hidden"
+      className="w-full max-w-3xl mx-auto bg-white/50 backdrop-blur-sm border border-black/20 overflow-hidden"
       style={{
         borderRadius: isBar ? "9999px" : "1rem",
         padding: isBar ? "0.5rem 0.75rem" : "0.75rem",
