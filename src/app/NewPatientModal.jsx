@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 export default function NewPatientModal({ isOpen, onClose }) {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -8,25 +9,39 @@ export default function NewPatientModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("http://127.0.0.1:5000/add-patient", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, age, condition }),
-    });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setStatus("No auth token found. Please login.");
+      return;
+    }
 
-    const data = await res.json();
+    try {
+      const res = await fetch('http://127.0.0.1:5000/add-patient', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // <-- token added
+        },
+        body: JSON.stringify({ name, age, condition }),
+      });
 
-    if (data.success) {
-      setStatus("Saved!");
-      setName("");
-      setAge("");
-      setCondition("");
-      setTimeout(() => {
-        setStatus(null);
-        onClose();
-      }, 1000);
-    } else {
-      setStatus(data.error || "Error");
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setStatus("Saved!");
+        setName("");
+        setAge("");
+        setCondition("");
+        setTimeout(() => {
+          setStatus(null);
+          onClose();
+        }, 1000);
+      } else {
+        setStatus(data.error || "Error");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("Network error");
     }
   };
 
@@ -113,14 +128,7 @@ export default function NewPatientModal({ isOpen, onClose }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-            className="w-full rounded-xl px-4 py-3
-                bg-transparent
-                border border-[rgba(255,255,255,0.3)]
-                text-inherit placeholder-[rgba(255,255,255,0.6)]
-                focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60
-                transition
-                caret-white
-                "
+              className="w-full rounded-xl px-4 py-3 bg-transparent border border-[rgba(255,255,255,0.3)] text-inherit placeholder-[rgba(255,255,255,0.6)] focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60 transition caret-white"
             />
             <p className="mt-1 text-xs text-[rgba(255,255,255,0.5)] select-none">
               Enter full patient name.
@@ -136,15 +144,7 @@ export default function NewPatientModal({ isOpen, onClose }) {
               required
               inputMode="numeric"
               pattern="[0-9]*"
-            className="w-full rounded-xl px-4 py-3
-                bg-transparent
-                border border-[rgba(255,255,255,0.3)]
-                text-white placeholder-[rgba(255,255,255,0.6)]
-                focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60
-                transition
-                caret-white
-                appearance-none
-              "
+              className="w-full rounded-xl px-4 py-3 bg-transparent border border-[rgba(255,255,255,0.3)] text-white placeholder-[rgba(255,255,255,0.6)] focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60 transition caret-white appearance-none"
               style={{ MozAppearance: "textfield" }}
               autoComplete="off"
             />
@@ -160,15 +160,7 @@ export default function NewPatientModal({ isOpen, onClose }) {
               onChange={(e) => setCondition(e.target.value)}
               required
               rows={5}
-            className="w-full rounded-xl px-4 py-3
-                bg-transparent
-                border border-[rgba(255,255,255,0.3)]
-                text-white placeholder-[rgba(255,255,255,0.6)]
-                focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60
-                transition
-                caret-white
-                resize-none
-              "
+              className="w-full rounded-xl px-4 py-3 bg-transparent border border-[rgba(255,255,255,0.3)] text-white placeholder-[rgba(255,255,255,0.6)] focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-60 transition caret-white resize-none"
             />
             <p className="mt-1 text-xs text-[rgba(255,255,255,0.5)] select-none">
               Brief description of patient's condition.
@@ -179,16 +171,7 @@ export default function NewPatientModal({ isOpen, onClose }) {
             <span className="text-sm text-green-400">{status}</span>
             <button
               type="submit"
-            className="rounded-xl px-6 py-3
-                bg-gradient-to-r from-[rgba(255,255,255,0.15)] to-[rgba(255,255,255,0.05)]
-                border border-[rgba(255,255,255,0.3)]
-                text-white
-                shadow-md
-                hover:bg-gradient-to-r hover:from-[rgba(255,255,255,0.3)] hover:to-[rgba(255,255,255,0.1)]
-                transition
-                backdrop-filter backdrop-blur-md
-                focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50
-              "
+              className="rounded-xl px-6 py-3 bg-gradient-to-r from-[rgba(255,255,255,0.15)] to-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.3)] text-white shadow-md hover:bg-gradient-to-r hover:from-[rgba(255,255,255,0.3)] hover:to-[rgba(255,255,255,0.1)] transition backdrop-filter backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
             >
               Save
             </button>

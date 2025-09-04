@@ -1,57 +1,54 @@
-import React, { createContext, useState, useContext } from "react";
+'use client';
+import { createContext, useContext, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
+  const { authFetch, loading: authLoading } = useAuth();
   const [messagesByPatient, setMessagesByPatient] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   async function loadHistory(patientId) {
-    if (!patientId) return;
-
-    if (messagesByPatient[patientId]) return;
+    if (!patientId || messagesByPatient[patientId]) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch(`http://127.0.0.1:5000/chat-history/${patientId}`);
-      if (!res.ok) throw new Error("Failed to fetch chat history");
-
-      const data = await res.json();
-
+      const data = await authFetch(`http://127.0.0.1:5000/chat-history/${patientId}`);
       setMessagesByPatient((prev) => ({
         ...prev,
         [patientId]: data || [],
       }));
     } catch (err) {
       console.error("Failed to fetch chat history", err);
-      setError(err.message);
+      setError(err.message || "Unknown error");
     } finally {
       setLoading(false);
     }
   }
 
-  async function sendMessage(patientId, messageText) {
-    if (!messageText.trim()) return;
+  async function sendMessage(patientId, { message, file_url, file_name }) {
+    // Do nothing if both are missing
+    if (!message && !file_url) return;
 
-    const userMessage = { role: "user", content: messageText };
-
+    // Optimistic UI for user
+    const userMessage = { role: "user", content: message || "📄 Sent file" };
     setMessagesByPatient((prev) => ({
       ...prev,
       [patientId]: [...(prev[patientId] || []), userMessage],
     }));
 
     try {
-      const res = await fetch(`http://127.0.0.1:5000/chat/${patientId}`, {
+      // POST to backend
+      const data = await authFetch(`http://127.0.0.1:5000/chat/${patientId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: messageText }),
+        body: JSON.stringify({ message, file_url, file_name }),
       });
 
-      const data = await res.json();
-
+      // If backend returns assistant response, add to chat
       if (data.response) {
         const assistantMessage = { role: "assistant", content: data.response };
         setMessagesByPatient((prev) => ({
@@ -59,8 +56,17 @@ export function ChatProvider({ children }) {
           [patientId]: [...(prev[patientId] || []), assistantMessage],
         }));
       }
-    } catch (error) {
-      console.error("Failed to send message", error);
+
+      // If backend returns EEG summary (file only), add system message
+      if (data.eeg_summary) {
+        const systemMessage = { role: "system", content: data.eeg_summary };
+        setMessagesByPatient((prev) => ({
+          ...prev,
+          [patientId]: [...(prev[patientId] || []), systemMessage],
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to send message", err);
       setMessagesByPatient((prev) => ({
         ...prev,
         [patientId]: [
@@ -70,6 +76,8 @@ export function ChatProvider({ children }) {
       }));
     }
   }
+
+  if (authLoading) return null;
 
   return (
     <ChatContext.Provider

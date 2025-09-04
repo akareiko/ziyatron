@@ -1,68 +1,280 @@
 'use client';
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef, memo } from "react";
+import clsx from "clsx";
+import Link from "next/link";
 
-export default function ChatPage() {
-  const { chatId } = useParams();
-  const [messages] = useState([
-    {
-      sender: "bot",
-      text: `Patient presents with intermittent chest pain and shortness of breath over the last 3 days. 
-      No history of trauma or previous cardiac issues. Vital signs stable. Recommend ECG and blood work for further evaluation.`,
-    },
-    { sender: "user", text: "It was ganjubassovstvo" },
-    {
-      sender: "bot",
-      text: `Physical examination reveals normal heart sounds with no murmurs. Lungs are clear to auscultation bilaterally. 
-      No peripheral edema observed. Suggest monitoring vitals and follow-up in 24 hours.`,
-    },
-    { sender: "user", text: "okay thanks how can I improve it?" },
-    {
-      sender: "bot",
-      text: `Advise patient to avoid strenuous activity until symptoms resolve. 
-      Encourage hydration and proper medication adherence.`,
-    },
-  ]);
+// ---------------------
+// Debounce hook
+// ---------------------
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
 
+// ---------------------
+// SidebarItem component
+// ---------------------
+const SidebarItem = memo(({ icon, label, collapsed, onClick, selected }) => (
+  <div
+    onClick={onClick}
+    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick?.()}
+    role="button"
+    tabIndex={0}
+    className={clsx(
+      "flex items-center p-1.5 rounded-lg text-black cursor-pointer transition-colors duration-200 hover:bg-white/40 w-full",
+      selected && "bg-white/40 shadow"
+    )}
+  >
+    <span className="w-6 h-5 flex justify-center items-center flex-shrink-0">{icon}</span>
+    <span
+      className={clsx(
+        "whitespace-nowrap overflow-hidden transition-all duration-200",
+        collapsed ? "w-0 opacity-0 pointer-events-none ml-0" : "opacity-100 ml-2"
+      )}
+    >
+      {label}
+    </span>
+  </div>
+));
+
+// ---------------------
+// SidebarHeader (collapse button)
+// ---------------------
+function SidebarHeader({ collapsed, setCollapsed }) {
   return (
-    <div className="min-h-screen p-6 text-white font-sans">
-      <h1 className="text-2xl mb-6">Chat with: {chatId}</h1>
+    <div className="mb-2">
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="flex items-center p-1.5 rounded-lg text-black hover:bg-white/40 cursor-pointer transition-colors duration-200 w-full"
+        aria-label="Toggle sidebar"
+        aria-pressed={collapsed}
+      >
+        <span className="w-6 h-5 flex justify-center items-center flex-shrink-0 text-gray-600">
+          {collapsed ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          )}
+        </span>
+        <span className={clsx("whitespace-nowrap overflow-hidden transition-all duration-200", collapsed ? "w-0 opacity-0 pointer-events-none ml-0" : "opacity-100 ml-2")}>
+          Collapse
+        </span>
+      </button>
+    </div>
+  );
+}
 
-      <div className="space-y-6 max-w-3xl mx-auto">
-        {messages.map((msg, i) => {
-          if (msg.sender === "bot") {
-            // Bot messages: plain structured text, no bg, left aligned, line breaks preserved
-            return (
-              <div
-                key={i}
-                className="text-left whitespace-pre-line leading-relaxed max-w-2xl"
-                style={{ whiteSpace: 'pre-line' }}
+// ---------------------
+// PatientList component
+// ---------------------
+const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }) => (
+  <div className="mt-8">
+    <h4 className={clsx(
+      "mb-2 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap",
+      collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+    )}>
+      Patients
+    </h4>
+    <ul role="list" className="flex flex-col gap-1">
+      {patients.map((patient) => (
+        <li key={patient.id}>
+          <Link
+            href={`/chat/${patient.id}`}
+            className={clsx(
+              "flex items-center p-1.5 rounded-lg text-black hover:bg-white/40 cursor-pointer transition gap-3 w-full",
+              selectedChat === patient.id && "bg-white/40 shadow"
+            )}
+            onClick={() => setSelectedChat(patient.id)}
+          >
+            <span className={clsx(
+              "whitespace-nowrap overflow-hidden transition-all duration-200",
+              collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100 ml-2"
+            )}>
+              {patient.name}
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+));
+
+// ---------------------
+// SidebarAccount component
+// ---------------------
+function SidebarAccount() {
+  return (
+    <div className="flex items-center gap-3 p-2 mx-4 mb-2 rounded-lg hover:bg-white/20 hover:shadow">
+      <div className="w-10 h-10 rounded-full bg-gray-600" />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <span className="truncate font-medium text-black">John Doe</span>
+        <span className="text-xs text-gray-600 truncate">Account</span>
+      </div>
+      <button className="text-black hover:text-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+// ---------------------
+// SearchPopup component
+// ---------------------
+function SearchPopup({ searchTerm, setSearchTerm, searchResults, setSearchResults, loadingSearch, setShowSearch, setSelectedChat }) {
+  return (
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50"
+      onKeyDown={(e) => e.key === "Escape" && setShowSearch(false)}
+      tabIndex={-1}
+    >
+      <div className="w-full max-w-2xl bg-white/30 backdrop-blur-xl p-8 rounded-2xl shadow-2xl h-[80vh] flex flex-col relative">
+        {/* Close button */}
+        <button
+          onClick={() => setShowSearch(false)}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10 transition"
+          aria-label="Close search"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search patient chats..."
+          className="w-full p-3 rounded-lg bg-white/60 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
+        />
+
+        <div className="mt-6 flex-1 overflow-y-auto space-y-2">
+          {loadingSearch && <div className="text-gray-600">Searching...</div>}
+          {searchResults.length > 0 &&
+            searchResults.map((msg) => (
+              <Link
+                key={msg.message_id || msg.patient_id}
+                href={`/chat/${msg.patient_id}`}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/60 text-black text-sm transition"
+                onClick={() => {
+                  setSelectedChat(msg.patient_id);
+                  setSearchTerm("");
+                  setSearchResults([]);
+                  setShowSearch(false);
+                }}
               >
-                {msg.text}
-              </div>
-            );
-          } else {
-            // User messages: glassmorphism chat bubble, right aligned
-            return (
-              <div key={i} className="flex justify-end">
-                <div
-                  className="inline-block px-5 py-3 max-w-xs sm:max-w-md md:max-w-lg rounded-3xl text-white"
-                  style={{
-                    background:
-                      'rgba(255, 255, 255, 0.1)', // translucent white
-                    backdropFilter: 'blur(10px)', // blur effect behind
-                    WebkitBackdropFilter: 'blur(10px)', // for Safari
-                    border: '1px solid rgba(255, 255, 255, 0.25)',
-                    boxShadow: '0 4px 30px rgba(255, 255, 255, 0.1)',
-                  }}
-                >
-                  {msg.text}
-                </div>
-              </div>
-            );
-          }
-        })}
+                <span className="w-6 h-6 flex-shrink-0 flex justify-center items-center bg-gray-300 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h6m-6 4h4m-2 4a9 9 0 100-18 9 9 0 000 18z" />
+                  </svg>
+                </span>
+                <span className="font-medium">{msg.patient_name || msg.role || "Unknown Patient"}</span>
+                <span className="text-gray-600 truncate flex-1">{msg.content.slice(0, 60)}...</span>
+              </Link>
+            ))}
+        </div>
       </div>
     </div>
+  );
+}
+
+// ---------------------
+// Main Sidebar component
+// ---------------------
+export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) {
+  const [patients, setPatients] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loadingSearch, setLoadingSearch] = useState(false);
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:5000/patients');
+        const data = await res.json();
+        setPatients(data);
+      } catch (err) {
+        console.error("Failed to fetch patients:", err);
+      }
+    };
+    fetchPatients();
+  }, []);
+
+  useEffect(() => {
+    if (!debouncedSearchTerm.trim()) return setSearchResults([]);
+    const search = async () => {
+      setLoadingSearch(true);
+      try {
+        const res = await fetch(`http://127.0.0.1:5000/search?q=${encodeURIComponent(debouncedSearchTerm)}`);
+        const data = await res.json();
+        setSearchResults(data);
+      } catch (err) {
+        console.error("Search failed:", err);
+      } finally {
+        setLoadingSearch(false);
+      }
+    };
+    search();
+  }, [debouncedSearchTerm]);
+
+  return (
+    <>
+      <aside
+        className={clsx(
+          "top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden",
+          collapsed ? "" : "translate-x-0 bg-[#243c5a]/15 backdrop-blur-md shadow-lg"
+        )}
+        aria-label="Sidebar"
+      >
+        <div className="h-full px-4 overflow-y-auto text-sm flex flex-col">
+          <SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+
+          {/* Menu */}
+          <div className="flex flex-col gap-2">
+            <SidebarItem
+              icon={<span className="w-5 h-5 bg-gray-300 rounded-full" />}
+              label="New patient"
+              collapsed={collapsed}
+              onClick={onNewPatientClick}
+            />
+            <SidebarItem
+              icon={<span className="w-5 h-5 bg-gray-300 rounded-full" />}
+              label="Search chats"
+              collapsed={collapsed}
+              onClick={() => setShowSearch(true)}
+            />
+          </div>
+
+          {!collapsed && <PatientList patients={patients} selectedChat={selectedChat} setSelectedChat={setSelectedChat} collapsed={collapsed} />}
+        </div>
+
+        {!collapsed && <SidebarAccount />}
+      </aside>
+
+      {showSearch && (
+        <SearchPopup
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          searchResults={searchResults}
+          setSearchResults={setSearchResults}
+          loadingSearch={loadingSearch}
+          setShowSearch={setShowSearch}
+          setSelectedChat={setSelectedChat}
+        />
+      )}
+    </>
   );
 }
