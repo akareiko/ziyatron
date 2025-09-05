@@ -37,9 +37,7 @@ export default function LayoutWrapper({ children }) {
               </div>
 
               {/* AskInput fixed at bottom inside panel */}
-              <div className="mt-4">
                 <AskInputWrapper />
-              </div>
             </div>
           </div>
         </div>

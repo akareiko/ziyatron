@@ -1,9 +1,9 @@
-'use client';
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "./context/AuthContext";
 import { createPortal } from "react-dom";
+import { useAuth } from "./context/AuthContext";
+import clsx from "clsx";
 
-export default function SidebarAccount() {
+export default function SidebarAccount({ onClick, collapsed }) {
   const { user, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -16,7 +16,10 @@ export default function SidebarAccount() {
 
   if (!user)
     return (
-      <span className="cursor-pointer" onClick={() => alert("Please login")}>
+      <span
+        className="cursor-pointer w-full flex justify-center p-2"
+        onClick={() => alert("Please login")}
+      >
         Login
       </span>
     );
@@ -54,18 +57,28 @@ export default function SidebarAccount() {
   return (
     <>
       {/* Account button */}
-      <div className="relative">
+      <div className="relative w-full">
         <div
-          onClick={() => setShowMenu(!showMenu)}
-          className="flex items-center gap-2 text-sm rounded-2xl cursor-pointer m-2 p-2 rounded hover:bg-gray-100 transition"
-        >
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold"
-            style={{ backgroundColor: bgColor }}
-          >
-            {initial}
-          </div>
-          <span>{user.name || user.email}</span>
+            onClick={() => setShowMenu(!showMenu)}
+            className="flex items-center h-12 px-3.5 rounded-lg transition-colors duration-200 cursor-pointer hover:bg-black/10 w-full"
+            >
+            {/* Avatar */}
+            <div
+                className="w-5 h-5 rounded-full flex items-center justify-center text-white text-sm font-light flex-shrink-0"
+                style={{ backgroundColor: bgColor }}
+            >
+                {initial}
+            </div>
+
+            {/* Name: keep width even when collapsed */}
+            <span
+                className={clsx(
+                "ml-2 transition-all duration-200 truncate",
+                collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+                )}
+            >
+                {user.name || user.email}
+            </span>
         </div>
 
         {/* Dropdown menu */}

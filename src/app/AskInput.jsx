@@ -2,6 +2,7 @@
 import { useState, useRef, useLayoutEffect, useRef as useReactRef } from "react";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "./firebase";
+import { createPortal } from "react-dom";
 
 export default function AskInput({ onSend, onUploadClick }) {
   const [inputValue, setInputValue] = useState("");
@@ -11,12 +12,76 @@ export default function AskInput({ onSend, onUploadClick }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const textareaRef = useRef(null);
   const prevIsBar = useReactRef(isBar);
+  const fileInputRef = useRef(null);
 
   const preventDefaults = (e) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
+  function UploadButton() {
+    const [hover, setHover] = useState(false);
+    const [pos, setPos] = useState({ top: 0, left: 0 });
+    const buttonRef = useRef(null);
+    useLayoutEffect(() => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom, left: rect.left + rect.width / 2 });
+    }
+  }, [hover]);
+
+    const button = (
+      <button
+        type="button"
+        ref={buttonRef}
+        onClick={handleUploadClick}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        aria-label="Upload file"
+        className="p-2 rounded-full hover:bg-black/10 transition"
+      >
+        <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
+          <path d="M12 4v16M4 12h16" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+    );
+
+    // Tooltip to body via portal
+    const tooltip =
+    hover &&
+    createPortal(
+      <div
+        className="absolute px-2 py-1 rounded text-xs text-white bg-black/80 whitespace-nowrap shadow"
+        style={{
+          top: `${pos.top + 8}px`, // 8px below
+          left: `${pos.left}px`,
+          transform: "translateX(-50%)",
+          position: "absolute",
+          zIndex: 9999,
+        }}
+      >
+        Upload
+      </div>,
+      document.body
+    );
+
+  return (
+    <>
+      {button}
+      {tooltip}
+    </>
+  );
+}
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) uploadFile(file);
+    e.target.value = ""; // reset so selecting same file again works
+  };
   // Drag and drop
   const handleDrop = (e) => {
     preventDefaults(e);
@@ -130,13 +195,15 @@ export default function AskInput({ onSend, onUploadClick }) {
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
     >
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={handleFileChange}
+      />
       <div className={`flex items-center gap-2 ${isBar ? "" : "mb-2"}`}>
         {isBar && (
-          <button onClick={onUploadClick} className="p-2 hover:bg-black/10 rounded-full transition">
-            <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M12 4v16M4 12h16" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+          <UploadButton onClick={handleUploadClick} />
         )}
 
         <textarea

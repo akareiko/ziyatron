@@ -4,6 +4,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { useAuth } from "./context/AuthContext";
 import SidebarAccount from "./SidebarAccount";
+import { useRef } from "react";
 
 // ---------------------
 // Debounce hook
@@ -77,37 +78,104 @@ function SidebarHeader({ collapsed, setCollapsed }) {
 // ---------------------
 // PatientList component
 // ---------------------
-const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }) => (
-  <div className="mt-8">
-    <h4 className={clsx(
-      "mb-1.5 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap",
-      collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
-    )}>
-      Patients
-    </h4>
-    <ul role="list" className="flex flex-col gap-1">
-      {patients.map((patient) => (
-        <li key={patient.id}>
-          <Link
-            href={`/chat/${patient.id}`}
-            className={clsx(
-              "flex items-center p-1.5 rounded-lg text-black hover:bg-white/40 cursor-pointer transition gap-3 w-full",
-              selectedChat === patient.id && "bg-white/40 shadow"
+const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }) => {
+  const [openMenu, setOpenMenu] = useState(null); // track which patient’s menu is open
+  const menuRef = useRef(null);
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="mt-8">
+      <h4
+        className={clsx(
+          "mb-1.5 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap",
+          collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+        )}
+      >
+        Patients
+      </h4>
+      <ul role="list" className="flex flex-col gap-1">
+        {patients.map((patient) => (
+          <li key={patient.id} className="relative group">
+            {/* Entire row clickable */}
+            <Link
+              href={`/chat/${patient.id}`}
+              className={clsx(
+                "flex items-center p-1.5 rounded-lg text-black hover:bg-black/10 cursor-pointer transition gap-3 w-full",
+                selectedChat === patient.id && "bg-white/40 shadow"
+              )}
+              onClick={() => setSelectedChat(patient.id)}
+            >
+              <span
+                className={clsx(
+                  "whitespace-nowrap overflow-hidden transition-all duration-200",
+                  collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
+                )}
+              >
+                {patient.name}
+              </span>
+            </Link>
+
+            {/* Triple dot button positioned absolutely */}
+            {!collapsed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // prevent row click
+                  setOpenMenu(openMenu === patient.id ? null : patient.id);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
+                aria-label="More options"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentcolor">
+                  <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/>
+                </svg>
+              </button>
             )}
-            onClick={() => setSelectedChat(patient.id)}
-          >
-            <span className={clsx(
-              "whitespace-nowrap overflow-hidden transition-all duration-200",
-              collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
-            )}>
-              {patient.name}
-            </span>
-          </Link>
-        </li>
-      ))}
-    </ul>
-  </div>
-));
+
+            {/* Popup menu */}
+            {openMenu === patient.id && (
+              <ul
+                ref={menuRef}
+                className="absolute right-0 top-10 w-48 bg-white border border-gray-300 shadow-md rounded-xl overflow-hidden z-50 py-1"
+              >
+                <li
+                  className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 cursor-pointer rounded-xl w-[90%] ml-3 my-1"
+                  onClick={() => alert(`Share ${patient.name}`)}
+                >
+                  Share
+                </li>
+                <li
+                  className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 cursor-pointer rounded-xl w-[90%] ml-3 my-1"
+                  onClick={() => alert(`Edit ${patient.name}`)}
+                >
+                  Edit
+                </li>
+                <li>
+                  <hr className="border-t border-gray-300 mx-4 my-1" />
+                </li>
+                <li
+                  className="flex items-center gap-2 px-4 py-2 text-red-600 text-sm hover:bg-gray-100 cursor-pointer rounded-xl w-[90%] ml-3 my-1"
+                  onClick={() => alert(`Delete ${patient.name}`)}
+                >
+                  Delete
+                </li>
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+});
 
 // ---------------------
 // SidebarAccount
@@ -296,7 +364,7 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
           )}
         </div>
 
-        {!collapsed && <SidebarAccount onClick={() => setShowAuth(true)} />}
+        <SidebarAccount onClick={() => setShowAuth(true)} collapsed={collapsed} />
       </aside>
 
       {showSearch && (

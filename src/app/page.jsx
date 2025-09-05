@@ -142,6 +142,50 @@ function EphemeralAskInput({ onFirstMessage }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // put these above your return inside EphemeralAskInput
+function CopyIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="#000000ff"><path d="M760-200H320q-33 0-56.5-23.5T240-280v-560q0-33 23.5-56.5T320-920h280l240 240v400q0 33-23.5 56.5T760-200ZM560-640v-200H320v560h440v-360H560ZM160-40q-33 0-56.5-23.5T80-120v-560h80v560h440v80H160Zm160-800v200-200 560-560Z"/></svg>
+  );
+}
+
+function CopyButton({ text }) {
+  const [hover, setHover] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const doCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      // ignore
+    }
+  };
+
+  return (
+    <div className="relative inline-flex items-center">
+      <button
+        type="button"
+        onClick={doCopy}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        aria-label="Copy message"
+        className="p-1 rounded-md hover:bg-black/10 transition"
+      >
+        <CopyIcon />
+      </button>
+
+      {/* Tooltip below button */}
+      {(hover || copied) && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 px-2 py-1 rounded text-xs text-white bg-black/80 whitespace-nowrap shadow">
+          {copied ? "Copied!" : "Copy"}
+        </div>
+      )}
+    </div>
+  );
+}
+
   useEffect(() => {
     if (messages.length > 0) scrollToBottom();
   }, [messages]);
@@ -181,18 +225,23 @@ function EphemeralAskInput({ onFirstMessage }) {
           {messages.map((msg, i) => {
             if (msg.role === "assistant") {
               return (
-                <div
-                  key={i}
-                  className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words break-all overflow-x-hidden"
-                >
-                  {msg.content}
+                <div key={i} className="flex flex-col items-start gap-1">
+                  <div className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words break-all overflow-x-hidden bg-white/70 text-black">
+                    {msg.content}
+                  </div>
+                  <div className="pl-2">
+                    <CopyButton text={msg.content} />
+                  </div>
                 </div>
               );
             } else if (msg.role === "user") {
               return (
-                <div key={i} className="flex justify-end">
+                <div key={i} className="flex flex-col items-end gap-1">
                   <div className="inline-block px-4 py-2 max-w-xs sm:max-w-md md:max-w-lg rounded-2xl text-black bg-[#243c5a]/15 break-words break-all overflow-x-hidden">
                     {msg.content}
+                  </div>
+                  <div className="pr-2">
+                    <CopyButton text={msg.content} />
                   </div>
                 </div>
               );
