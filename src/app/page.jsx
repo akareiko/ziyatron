@@ -5,6 +5,7 @@ import LayoutWrapper from "./LayoutWrapper";
 import AskInput from "./AskInput";
 import SplineBackground from "./Splinebg";
 import { useRef, useEffect } from "react";
+import Link from "next/link";
 
 // ---------------------
 // Auth Popup (unchanged)
@@ -315,21 +316,22 @@ export default function Page({ children }) {
   </div>
 
   <div className="fixed top-4 right-4 z-50">
+  <Link href="/login">
     <button
-      onClick={() => setShowAuth(true)}
       className={`px-4 py-2 rounded-full transition-colors duration-300 ${
         animatedMode ? "bg-[#e5e5d9]/70 text-black" : "bg-black text-white"
       }`}
     >
       Sign In
     </button>
-  </div>
+  </Link>
+</div>
 
   {showAuth && <AuthPopup onClose={() => setShowAuth(false)} animatedMode={animatedMode} />}
 
   {/* Title */}
   <div
-    className={`absolute left-1/2 transform -translate-x-1/2 transition-all duration-500 ${
+    className={`absolute left-1/2 transform -translate-x-1/2 transition-all duration-500 pb-30 ${
       firstMessageSent
         ? "top-4 text-4xl md:text-3xl" // slide to top
         : "top-1/2 -translate-y-1/2 text-4xl md:text-5xl" // center
@@ -343,7 +345,7 @@ export default function Page({ children }) {
   {/* Chat input + annotation */}
   <div
     className={`absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-500 px-4 w-full max-w-3xl ${
-      firstMessageSent ? "bottom-10" : "top-1/2 translate-y-12" // below title initially
+      firstMessageSent ? "bottom-10" : "top-1/2" // below title initially
     }`}
   >
     <EphemeralAskInput

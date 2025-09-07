@@ -1,34 +1,31 @@
+// app/components/AskInput.jsx
 'use client';
-import { useState, useRef, useLayoutEffect, useRef as useReactRef } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "./firebase";
 import { createPortal } from "react-dom";
 
-export default function AskInput({ onSend, onUploadClick }) {
+export default function AskInput({ onSend, onUploadClick, externalFile = null, onExternalFileHandled = () => {} }) {
   const [inputValue, setInputValue] = useState("");
-  const [uploadedFile, setUploadedFile] = useState(null); // { file, url, name, uploadTask }
+  const [uploadedFile, setUploadedFile] = useState(null); 
   const [isBar, setIsBar] = useState(true);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
   const textareaRef = useRef(null);
-  const prevIsBar = useReactRef(isBar);
+  const prevIsBar = useRef(isBar);
   const fileInputRef = useRef(null);
 
-  const preventDefaults = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
+  // --- UploadButton same as before ---
   function UploadButton() {
     const [hover, setHover] = useState(false);
     const [pos, setPos] = useState({ top: 0, left: 0 });
     const buttonRef = useRef(null);
     useLayoutEffect(() => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPos({ top: rect.bottom, left: rect.left + rect.width / 2 });
-    }
-  }, [hover]);
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setPos({ top: rect.bottom, left: rect.left + rect.width / 2 });
+      }
+    }, [hover]);
 
     const button = (
       <button
@@ -46,10 +43,7 @@ export default function AskInput({ onSend, onUploadClick }) {
       </button>
     );
 
-    // Tooltip to body via portal
-    const tooltip =
-    hover &&
-    createPortal(
+    const tooltip = hover && createPortal(
       <div
         className="absolute px-2 py-1 rounded text-xs text-white bg-black/80 whitespace-nowrap shadow"
         style={{
@@ -65,43 +59,24 @@ export default function AskInput({ onSend, onUploadClick }) {
       document.body
     );
 
-  return (
-    <>
-      {button}
-      {tooltip}
-    </>
-  );
-}
+    return (<>{button}{tooltip}</>);
+  }
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleUploadClick = () => fileInputRef.current?.click();
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) uploadFile(file);
-    e.target.value = ""; // reset so selecting same file again works
+    e.target.value = "";
   };
-  // Drag and drop
-  const handleDrop = (e) => {
-    preventDefaults(e);
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) uploadFile(files[0]); // first file only
-  };
-  const handleDragOver = preventDefaults;
-  const handleDragEnter = preventDefaults;
-
-  const handleChange = (e) => setInputValue(e.target.value);
 
   const handleSend = () => {
     if (!inputValue.trim() && !uploadedFile?.url) return;
-
     onSend?.({
       message: inputValue.trim(),
       file_url: uploadedFile?.url || null,
       file_name: uploadedFile?.name || null,
     });
-
     setInputValue("");
     setUploadedFile(null);
     setUploadProgress(0);
@@ -110,9 +85,7 @@ export default function AskInput({ onSend, onUploadClick }) {
   const uploadFile = (file) => {
     const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
-
     setUploadedFile({ file, name: file.name, uploadTask, url: null });
-
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -135,11 +108,9 @@ export default function AskInput({ onSend, onUploadClick }) {
 
   const cancelUpload = async () => {
     if (!uploadedFile) return;
-
     if (uploadedFile.uploadTask?.cancel) {
-      uploadedFile.uploadTask.cancel();
+      try { uploadedFile.uploadTask.cancel(); } catch {}
     }
-
     if (uploadedFile.url) {
       try {
         let path;
@@ -154,46 +125,50 @@ export default function AskInput({ onSend, onUploadClick }) {
         console.error("Failed to delete uploaded file:", err);
       }
     }
-
     setUploadedFile(null);
     setUploadProgress(0);
   };
 
-  // Dynamic textarea height
+  // Expand to "not bar" if multiline OR file exists
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
+
     el.style.height = "auto";
     el.style.height = Math.min(el.scrollHeight, 150) + "px";
+
     const lineHeight = parseInt(window.getComputedStyle(el).lineHeight, 10) || 20;
     const visibleLines = Math.ceil(el.scrollHeight / lineHeight);
-    const newIsBar = inputValue.trim() === "" || visibleLines <= 1;
+    const newIsBar = (inputValue.trim() === "" && !uploadedFile) || (visibleLines <= 1 && !uploadedFile);
+
     if (prevIsBar.current === false && newIsBar === true) setTransitionEnabled(true);
     if (prevIsBar.current === true && newIsBar === false) setTransitionEnabled(false);
     if (prevIsBar.current !== newIsBar) {
       setIsBar(newIsBar);
       prevIsBar.current = newIsBar;
     }
-  }, [inputValue]);
+  }, [inputValue, uploadedFile]);
 
-  useLayoutEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = Math.min(el.scrollHeight, 150) + "px";
-  }, [isBar]);
+  // handle external file
+  useEffect(() => {
+    if (!externalFile) return;
+    (async () => {
+      try {
+        uploadFile(externalFile);
+      } finally {
+        onExternalFileHandled?.();
+      }
+    })();
+  }, [externalFile]);
 
   return (
     <div
-      className="w-full max-w-3xl mx-auto bg-white/50 backdrop-blur-sm border border-black/20 overflow-hidden"
+      className="w-full max-w-3xl mx-auto bg-white backdrop-blur-lg border border-black/20 overflow-hidden"
       style={{
         borderRadius: isBar ? "9999px" : "1rem",
         padding: isBar ? "0.5rem 0.75rem" : "0.75rem",
         transition: transitionEnabled ? "border-radius 0.3s ease, padding 0.3s ease" : "none",
       }}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
     >
       <input
         ref={fileInputRef}
@@ -201,11 +176,47 @@ export default function AskInput({ onSend, onUploadClick }) {
         className="hidden"
         onChange={handleFileChange}
       />
-      <div className={`flex items-center gap-2 ${isBar ? "" : "mb-2"}`}>
-        {isBar && (
-          <UploadButton onClick={handleUploadClick} />
-        )}
 
+      {uploadedFile && (
+      <div className="mb-2 flex items-start">
+        <div className="relative w-24 h-24 bg-[#243c5a]/10 border border-[#243c5a]/30 rounded-lg flex items-center justify-center shadow-sm">
+          <span className="text-xs text-center px-1 truncate">📄 {uploadedFile.name}</span>
+
+          {uploadProgress > 0 && (
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 36 36">
+              <path
+                className="text-gray-300"
+                stroke="currentColor"
+                strokeWidth="3"
+                fill="none"
+                d="M18 2a16 16 0 1 1 0 32 16 16 0 1 1 0-32"
+              />
+              <path
+                className="text-blue-600"
+                stroke="currentColor"
+                strokeWidth="3"
+                fill="none"
+                strokeDasharray="100, 100"
+                strokeDashoffset={100 - uploadProgress}
+                strokeLinecap="round"
+                d="M18 2a16 16 0 1 1 0 32 16 16 0 1 1 0-32"
+              />
+            </svg>
+          )}
+
+          <button
+            onClick={cancelUpload}
+            className="absolute top-1 right-1 text-red-500 font-bold hover:bg-red-100 rounded-full px-1"
+            title="Cancel upload"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    )}
+
+      <div className={`flex items-center gap-2 ${isBar ? "" : "mb-2"}`}>
+        {isBar && <UploadButton onClick={handleUploadClick} />}
         <textarea
           ref={textareaRef}
           value={inputValue}
@@ -215,13 +226,12 @@ export default function AskInput({ onSend, onUploadClick }) {
               handleSend();
             }
           }}
-          onChange={handleChange}
+          onChange={(e) => setInputValue(e.target.value)}
           placeholder="Type or drop a file..."
           className="flex-1 resize-none bg-transparent outline-none text-black placeholder-gray scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent"
-          style={{ maxHeight: "150px", minHeight: isBar ? "1.5rem" : "2rem" }}
+          style={{ maxHeight: "150px", minHeight: "1.5rem"}}
           rows={1}
         />
-
         {isBar && (
           <button onClick={handleSend} className="p-2 hover:bg-black/10 rounded-full transition">
             <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
@@ -229,28 +239,52 @@ export default function AskInput({ onSend, onUploadClick }) {
             </svg>
           </button>
         )}
+        
       </div>
 
-      {/* File preview bubble */}
-      {uploadedFile && (
-        <div className="flex items-center justify-between mt-2 bg-[#243c5a]/10 border border-[#243c5a]/30 rounded-lg px-3 py-2 max-w-sm sm:max-w-md md:max-w-lg shadow-sm">
-          <span className="truncate overflow-hidden text-sm">📄 {uploadedFile.name}</span>
+      {!isBar && (
+        <div className="flex flex-row justify-between mt-1 px-1">
           <button
-            onClick={cancelUpload}
-            className="text-red-500 font-bold ml-2 hover:bg-red-100 rounded-full px-1"
-            title="Cancel upload"
+            onClick={onUploadClick}
+            className="p-2 hover:bg-black/10 rounded-full transition"
           >
-            ✕
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="black"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 4v16M4 12h16"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={handleSend}
+            className="p-2 hover:bg-black/10 rounded-full transition"
+          >
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="black"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M9 5l7 7-7 7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         </div>
       )}
 
-      {/* Upload progress */}
-      {uploadProgress > 0 && (
-        <div className="w-full bg-black/10 h-1 rounded mt-1">
-          <div className="bg-blue-500 h-1 rounded" style={{ width: `${uploadProgress}%` }} />
-        </div>
-      )}
     </div>
   );
 }

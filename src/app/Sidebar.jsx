@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useAuth } from "./context/AuthContext";
 import SidebarAccount from "./SidebarAccount";
 import { useRef } from "react";
+import { createPortal } from "react-dom";
+import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
 
 // ---------------------
 // Debounce hook
@@ -76,106 +78,121 @@ function SidebarHeader({ collapsed, setCollapsed }) {
 }
 
 // ---------------------
-// PatientList component
+// PatientItem
 // ---------------------
-const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }) => {
-  const [openMenu, setOpenMenu] = useState(null); // track which patient’s menu is open
-  const menuRef = useRef(null);
+const PatientItem = ({ patient, collapsed, selectedChat, setSelectedChat }) => {
+  const [openMenu, setOpenMenu] = useState(false);
 
-  // Close when clicking outside
+  const { refs, floatingStyles } = useFloating({
+  open: openMenu,
+  onOpenChange: setOpenMenu,
+  placement: "top-end",
+  strategy: "fixed", // <-- ensures it won't be clipped by sidebar scroll
+  middleware: [offset(8), flip(), shift()],
+  whileElementsMounted: autoUpdate,
+});
+
+  // Close on outside click
   useEffect(() => {
+    if (!openMenu) return;
+
     const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setOpenMenu(null);
-      }
+      if (refs.reference.current?.contains(e.target) || refs.floating.current?.contains(e.target)) return;
+      setOpenMenu(false);
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [openMenu, refs]);
 
   return (
-    <div className="mt-8">
-      <h4
-        className={clsx(
-          "mb-1.5 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap",
-          collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
-        )}
+    <li className="relative group">
+      <Link
+        href={`/chat/${patient.id}`}
+        ref={refs.setReference}
+        className={`flex items-center p-1.5 rounded-lg cursor-pointer transition gap-0 w-full ${
+          selectedChat === patient.id ? "bg-white/40 shadow" : "hover:bg-black/10"
+        }`}
+        onClick={() => setSelectedChat(patient.id)}
       >
-        Patients
-      </h4>
-      <ul role="list" className="flex flex-col gap-1">
-        {patients.map((patient) => (
-          <li key={patient.id} className="relative group">
-            {/* Entire row clickable */}
-            <Link
-              href={`/chat/${patient.id}`}
-              className={clsx(
-                "flex items-center p-1.5 rounded-lg text-black hover:bg-black/10 cursor-pointer transition gap-3 w-full",
-                selectedChat === patient.id && "bg-white/40 shadow"
-              )}
-              onClick={() => setSelectedChat(patient.id)}
+        <span
+          className={`whitespace-nowrap overflow-hidden transition-all duration-200 ${
+            collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
+          }`}
+        >
+          {patient.name}
+        </span>
+
+        {!collapsed && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenMenu((prev) => !prev);
+            }}
+            className="ml-auto p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
+            aria-label="More options"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentcolor">
+              <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/>
+            </svg>
+          </button>
+        )}
+      </Link>
+
+      {openMenu &&
+        createPortal(
+          <ul
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className="w-48 bg-white border border-gray-300 shadow-md rounded-xl overflow-hidden z-[9999] p-1"
+          >
+            <li
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 cursor-pointer rounded-xl"
+              onClick={() => alert(`Share ${patient.name}`)}
             >
-              <span
-                className={clsx(
-                  "whitespace-nowrap overflow-hidden transition-all duration-200",
-                  collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
-                )}
-              >
-                {patient.name}
-              </span>
-            </Link>
-
-            {/* Triple dot button positioned absolutely */}
-            {!collapsed && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation(); // prevent row click
-                  setOpenMenu(openMenu === patient.id ? null : patient.id);
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
-                aria-label="More options"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentcolor">
-                  <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/>
-                </svg>
-              </button>
-            )}
-
-            {/* Popup menu */}
-            {openMenu === patient.id && (
-              <ul
-                ref={menuRef}
-                className="absolute right-0 top-10 w-48 bg-white border border-gray-300 shadow-md rounded-xl overflow-hidden z-50 py-1"
-              >
-                <li
-                  className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 cursor-pointer rounded-xl w-[90%] ml-3 my-1"
-                  onClick={() => alert(`Share ${patient.name}`)}
-                >
-                  Share
-                </li>
-                <li
-                  className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 cursor-pointer rounded-xl w-[90%] ml-3 my-1"
-                  onClick={() => alert(`Edit ${patient.name}`)}
-                >
-                  Edit
-                </li>
-                <li>
-                  <hr className="border-t border-gray-300 mx-4 my-1" />
-                </li>
-                <li
-                  className="flex items-center gap-2 px-4 py-2 text-red-600 text-sm hover:bg-gray-100 cursor-pointer rounded-xl w-[90%] ml-3 my-1"
-                  onClick={() => alert(`Delete ${patient.name}`)}
-                >
-                  Delete
-                </li>
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+              Share
+            </li>
+            <li
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 cursor-pointer rounded-xl"
+              onClick={() => alert(`Edit ${patient.name}`)}
+            >
+              Edit
+            </li>
+            <li>
+              <hr className="border-t border-gray-300 mx-4 my-1" />
+            </li>
+            <li
+              className="flex items-center gap-2 px-4 py-2 text-red-600 text-sm hover:bg-gray-100 cursor-pointer rounded-xl"
+              onClick={() => alert(`Delete ${patient.name}`)}
+            >
+              Delete
+            </li>
+          </ul>,
+          document.body
+        )}
+    </li>
   );
-});
+};
+
+// ---------------------
+// PatientList
+// ---------------------
+export const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }) => (
+  <div className="mt-8">
+    <h4
+      className={`mb-1.5 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap ${
+        collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+      }`}
+    >
+      Patients
+    </h4>
+    <ul role="list" className="flex flex-col">
+      {patients.map((p) => (
+        <PatientItem key={p.id} patient={p} collapsed={collapsed} selectedChat={selectedChat} setSelectedChat={setSelectedChat} />
+      ))}
+    </ul>
+  </div>
+));
 
 // ---------------------
 // SidebarAccount
@@ -219,7 +236,18 @@ function AuthPopup({ setShowAuth }) {
 // ---------------------
 // SearchPopup component
 // ---------------------
-function SearchPopup({ searchTerm, setSearchTerm, searchResults, setSearchResults, loadingSearch, setShowSearch, setSelectedChat }) {
+function SearchPopup({
+  searchTerm,
+  setSearchTerm,
+  searchResults,
+  setSearchResults,
+  loadingSearch,
+  setShowSearch,
+  setSelectedChat,
+}) {
+  const popupRef = useRef(null);
+
+  // Close on Escape
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") setShowSearch(false);
@@ -227,19 +255,38 @@ function SearchPopup({ searchTerm, setSearchTerm, searchResults, setSearchResult
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [setShowSearch]);
+
+  // Close on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (popupRef.current && !popupRef.current.contains(e.target)) {
+        setShowSearch(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setShowSearch]);
+
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center z-50"
-      tabIndex={-1}
-    >
-      <div className="w-full max-w-2xl bg-white/30 backdrop-blur-xl p-8 rounded-2xl shadow-2xl h-[80vh] flex flex-col relative">
+    <div className="fixed inset-0 flex items-center justify-center z-50" tabIndex={-1}>
+      <div
+        ref={popupRef}
+        className="w-full max-w-xl bg-white/30 backdrop-blur-xl p-8 rounded-2xl shadow-2xl h-[80vh] flex flex-col relative"
+      >
         {/* Close button */}
         <button
           onClick={() => setShowSearch(false)}
           className="absolute top-2 right-2 p-2 rounded-full hover:bg-black/10 transition"
           aria-label="Close search"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5 text-black"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -268,12 +315,25 @@ function SearchPopup({ searchTerm, setSearchTerm, searchResults, setSearchResult
                 }}
               >
                 <span className="w-6 h-6 flex-shrink-0 flex justify-center items-center bg-gray-300 rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h6m-6 4h4m-2 4a9 9 0 100-18 9 9 0 000 18z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-4 text-gray-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M7 8h10M7 12h6m-6 4h4m-2 4a9 9 0 100-18 9 9 0 000 18z"
+                    />
                   </svg>
                 </span>
                 <span className="font-medium">{msg.patient_name || msg.role || "Unknown Patient"}</span>
-                <span className="text-gray-600 truncate flex-1">{msg.content.slice(0, 60)}...</span>
+                <span className="text-gray-600 truncate flex-1">
+                  {msg.content.slice(0, 60)}...
+                </span>
               </Link>
             ))}
         </div>

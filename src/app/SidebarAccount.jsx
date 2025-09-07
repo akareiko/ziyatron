@@ -1,28 +1,37 @@
+'use client';
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "./context/AuthContext";
 import clsx from "clsx";
+import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
 
-export default function SidebarAccount({ onClick, collapsed }) {
+export default function SidebarAccount({ collapsed }) {
   const { user, logout } = useAuth();
-  const [showMenu, setShowMenu] = useState(false);
+  const [open, setOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const menuRef = useRef(null);
+
+  const { refs, floatingStyles } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement: "bottom-start",
+    middleware: [offset(8), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
 
   const handleLogout = () => {
     logout();
     window.location.href = "http://localhost:3000";
   };
 
-  if (!user)
-    return (
-      <span
-        className="cursor-pointer w-full flex justify-center p-2"
-        onClick={() => alert("Please login")}
-      >
-        Login
-      </span>
-    );
+//   if (!user)
+//     return (
+//       <span
+//         className="cursor-pointer w-full flex justify-center p-2"
+//         onClick={() => alert("Please login")}
+//       >
+//         Login
+//       </span>
+//     );
 
   const initial = (user.name || user.email || "U")[0].toUpperCase();
   const colorHash = Array.from(user.email || "user").reduce(
@@ -32,87 +41,106 @@ export default function SidebarAccount({ onClick, collapsed }) {
   const colors = ["#f87171", "#60a5fa", "#34d399", "#facc15", "#a78bfa"];
   const bgColor = colors[colorHash % colors.length];
 
-  // Close dropdown on Escape
+  // Close on Escape
   useEffect(() => {
-    if (!showMenu) return;
     const handleEsc = (e) => {
-      if (e.key === "Escape") setShowMenu(false);
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [showMenu]);
+      if (e.key !== "Escape") return;
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    if (!showMenu) return;
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
+      if (confirmLogout) {
+        setConfirmLogout(false);
+      } else if (open) {
+        setOpen(false);
       }
     };
+
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [open, confirmLogout]);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = (e) => {
+        const refEl = refs.reference.current;
+        const floatingEl = refs.floating.current;
+
+        // if click is inside account button or dropdown, do nothing
+        if (refEl?.contains(e.target) || floatingEl?.contains(e.target)) return;
+
+        // otherwise close dropdown
+        setOpen(false);
+    };
+
     window.addEventListener("mousedown", handleClickOutside);
     return () => window.removeEventListener("mousedown", handleClickOutside);
-  }, [showMenu]);
+    }, [open, refs]);
 
   return (
     <>
       {/* Account button */}
-      <div className="relative w-full">
+      <div className="relative w-full" ref={refs.setReference}>
         <div
-            onClick={() => setShowMenu(!showMenu)}
-            className="flex items-center h-12 px-3.5 rounded-lg transition-colors duration-200 cursor-pointer hover:bg-black/10 w-full"
-            >
-            {/* Avatar */}
-            <div
-                className="w-5 h-5 rounded-full flex items-center justify-center text-white text-sm font-light flex-shrink-0"
-                style={{ backgroundColor: bgColor }}
-            >
-                {initial}
-            </div>
+          onClick={() => setOpen((prev) => !prev)}
+          className="flex items-center h-12 px-3.5 rounded-lg transition-colors duration-200 cursor-pointer hover:bg-black/10 w-full"
+        >
+          {/* Avatar */}
+          <div
+            className="w-5 h-5 rounded-full flex items-center justify-center text-white text-sm font-light flex-shrink-0"
+            style={{ backgroundColor: bgColor }}
+          >
+            {initial}
+          </div>
 
-            {/* Name: keep width even when collapsed */}
-            <span
-                className={clsx(
-                "ml-2 transition-all duration-200 truncate",
-                collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
-                )}
-            >
-                {user.name || user.email}
-            </span>
+          {/* Name */}
+          <span
+            className={clsx(
+              "ml-2 transition-all duration-200 truncate",
+              collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+            )}
+          >
+            {user.name || user.email}
+          </span>
         </div>
 
         {/* Dropdown menu */}
-        {showMenu && (
-          <ul
-            ref={menuRef}
-            className="absolute bottom-full left-1/2 w-60 bg-white rounded-xl overflow-hidden z-50 transform -translate-x-1/2 py-2 shadow-lg"
-          >
-            <li className="flex items-center gap-2 px-4 py-2 text-gray-500 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1">
-              {user.email}
-            </li>
-            <li
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1 cursor-pointer"
-              onClick={() => alert("Settings clicked")}
+        {open &&
+          createPortal(
+            <ul
+              ref={refs.setFloating}
+              style={floatingStyles}
+              className="w-60 bg-white rounded-xl overflow-hidden z-[9999] p-1 shadow-lg"
             >
-              Settings
-            </li>
-            <li
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1 cursor-pointer"
-              onClick={() => alert("Help clicked")}
-            >
-              Help
-            </li>
-            <li>
-              <hr className="border-t border-gray-300 mx-4 my-1" />
-            </li>
-            <li
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl w-[90%] ml-3 my-1 cursor-pointer"
-              onClick={() => setConfirmLogout(true)}
-            >
-              Log out
-            </li>
-          </ul>
-        )}
+              <li className="flex items-center gap-2 px-4 py-2 text-gray-500 text-sm hover:bg-gray-100 rounded-xl cursor-default">
+                {user.email}
+              </li>
+              <li
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl cursor-pointer"
+                onClick={() => alert("Settings clicked")}
+              >
+                Settings
+              </li>
+              <li
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl cursor-pointer"
+                onClick={() => alert("Help clicked")}
+              >
+                Help
+              </li>
+              <li>
+                <hr className="border-t border-gray-300 mx-4 my-1" />
+              </li>
+              <li
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded-xl cursor-pointer"
+                onClick={() => {
+                  setOpen(false); // close menu first
+                  setConfirmLogout(true);
+                }}
+              >
+                Log out
+              </li>
+            </ul>,
+            document.body
+          )}
       </div>
 
       {/* Logout confirmation popup */}

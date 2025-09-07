@@ -17,40 +17,38 @@ export default function ChatPage() {
   }, [patientId]);
 
   return (
-    <LayoutWrapper>
-      <div className="min-h-screen p-6 text-black font-sans">
+      <div className="min-h-screen text-black font-sans">
         {loading && <p>Loading chat history...</p>}
         {error && <p className="text-red-400">Error: {error}</p>}
 
-        <div className="space-y-6 max-w-3xl mx-auto">
-          {messages.map((msg, i) => {
-            if (msg.role === "assistant") {
-              return (
-                <div
-                  key={i}
-                  className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words break-all overflow-x-hidden"
-                >
-                  {msg.content}
-                </div>
-              );
-            } else if (msg.role === "user") {
-              return (
-                <div key={i} className="flex justify-end">
-                  <div className="inline-block px-4 py-2 max-w-xs sm:max-w-md md:max-w-lg rounded-2xl text-black bg-[#243c5a]/15 break-words break-all overflow-x-hidden">
-                    {msg.content}
-                  </div>
-                </div>
-              );
-            } else {
-              return (
-                <div key={i} className="text-center text-sm text-red-400 italic">
-                  {msg.content}
-                </div>
-              );
-            }
-          })}
+        <div className="space-y-6 max-w-3xl mx-auto pt-4 pb-24">
+  {messages.map((msg, i) => {
+    if (msg.role === "assistant") {
+      return (
+        <div
+          key={i}
+          className="text-left py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-3xl break-words break-all overflow-x-hidden"
+        >
+          {msg.content}
         </div>
+      );
+    } else if (msg.role === "user") {
+      return (
+        <div key={i} className="flex justify-end">
+          <div className="inline-block px-4 py-2 max-w-xs sm:max-w-md md:max-w-lg rounded-2xl text-black bg-[#243c5a]/15 break-words break-all overflow-x-hidden">
+            {msg.content}
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div key={i} className="text-center text-sm text-red-400 italic">
+          {msg.content}
+        </div>
+      );
+    }
+  })}
+</div>
       </div>
-    </LayoutWrapper>
   );
 }

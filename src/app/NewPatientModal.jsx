@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
   const [name, setName] = useState("");
@@ -6,6 +6,7 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
   const [condition, setCondition] = useState("");
   const [status, setStatus] = useState("");
   const [visible, setVisible] = useState(isOpen);
+  const modalRef = useRef(null);
 
   // Open/close modal based on isOpen prop
   useEffect(() => {
@@ -20,6 +21,18 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  }, [visible]);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!visible) return;
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        handleClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [visible]);
 
   const handleClose = () => {
@@ -60,7 +73,11 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="w-full max-w-2xl p-6 rounded-2xl bg-white/30 backdrop-blur-xl shadow-2xl flex flex-col relative">
+      {/* Click-outside wrapper */}
+      <div 
+        ref={modalRef}
+        className="w-full max-w-xl p-6 rounded-2xl bg-white/30 backdrop-blur-xl shadow-2xl flex flex-col relative"
+      >
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10"
