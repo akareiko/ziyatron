@@ -10,7 +10,7 @@ export function ChatProvider({ children }) {
   const [messagesByPatient, setMessagesByPatient] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [isStreaming, setIsStreaming] = useState(false);
   const socketRef = useRef(null);
   const currentPatientIdRef = useRef(null);
 
@@ -65,7 +65,12 @@ export function ChatProvider({ children }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (deltaQueueRef.current.length === 0) return;
+      if (deltaQueueRef.current.length === 0) {
+        // Queue empty → streaming finished
+        setIsStreaming(false);
+        return;
+      }
+      setIsStreaming(true);
 
       const { patientId, text } = deltaQueueRef.current.shift();
 
@@ -148,7 +153,7 @@ export function ChatProvider({ children }) {
   if (authLoading) return null;
 
   return (
-    <ChatContext.Provider value={{ messagesByPatient, loadHistory, sendMessage, loading, error }}>
+    <ChatContext.Provider value={{ messagesByPatient, loadHistory, sendMessage, loading, error, isStreaming, setIsStreaming }}>
       {children}
     </ChatContext.Provider>
   );

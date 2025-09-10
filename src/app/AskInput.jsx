@@ -3,8 +3,8 @@
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "./firebase";
-import { createPortal } from "react-dom";
 import { useFloating, offset, flip, shift, FloatingPortal } from "@floating-ui/react";
+import { useChat } from "./context/ChatContext";
 
 export default function AskInput({ onSend, onUploadClick, externalFile = null, onExternalFileHandled = () => {} }) {
   const [inputValue, setInputValue] = useState("");
@@ -17,6 +17,7 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const { isStreaming, setIsStreaming } = useChat();
 
   function TooltipButton({ tooltip, children, className = "", ...props }) {
     const [open, setOpen] = useState(false);
@@ -64,6 +65,7 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
     if ((!inputValue.trim() && !uploadedFile?.url) || isSending || isUploading) return;
 
     setIsSending(true); // 🚨 lock input
+    setIsStreaming(true);
     // clear input/UI
     setInputValue("");
     setUploadedFile(null);
@@ -77,6 +79,7 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
       });
     } catch (err) {
       console.error("Send failed:", err);
+      setIsStreaming(false);
     } finally {
       setIsSending(false); // unlock input
     }
@@ -303,12 +306,12 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
           <TooltipButton
             tooltip={isSending ? "Processing..." : "Send"}
             onClick={handleSend}
-            disabled={isUploading || isSending}
+            disabled={isUploading || isSending || isStreaming}
             className={`p-2 rounded-full transition ${
-              isUploading || isSending ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"
+              isUploading || isSending || isStreaming ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"
             }`}
           >
-            {isSending ? (
+            {isStreaming ? (
               // Pause icon
               <svg
                 width="20"
@@ -360,21 +363,37 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
           <TooltipButton
             tooltip="Send"
             onClick={handleSend}
-            disabled={isUploading || isSending}
+            disabled={isUploading || isSending || isStreaming}
             className={`p-2 rounded-full transition ${
-              isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"
+              isUploading || isSending || isStreaming ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"
             }`}
           >
-            <svg
-              width="20"
-              height="20"
-              fill="none"
-              stroke="black"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            {isStreaming ? (
+              // Pause icon
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="black"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <rect x="6" y="5" width="4" height="14" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="14" y="5" width="4" height="14" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              // Send arrow
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="black"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
           </TooltipButton>
         </div>
       )}
