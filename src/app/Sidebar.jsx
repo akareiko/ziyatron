@@ -397,7 +397,7 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
     if (!user) return;
     const fetchPatients = async () => {
       try {
-        const data = await authFetch('http://127.0.0.1:5000/patients');
+        const data = await authFetch('http://127.0.0.1:5001/patients');
         setPatients(data);
       } catch (err) {
         console.error(err);
@@ -413,7 +413,7 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
     const search = async () => {
       setLoadingSearch(true);
       try {
-        const data = await authFetch(`http://127.0.0.1:5000/search?q=${encodeURIComponent(debouncedSearchTerm)}`, {}, localStorage.getItem("token"));
+        const data = await authFetch(`http://127.0.0.1:5001/search?q=${encodeURIComponent(debouncedSearchTerm)}`, {}, localStorage.getItem("token"));
         setSearchResults(data);
       } catch (err) {
         console.error(err);

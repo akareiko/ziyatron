@@ -48,7 +48,7 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
       return;
     }
     try {
-      const res = await fetch("http://127.0.0.1:5000/add-patient", {
+      const res = await fetch("http://127.0.0.1:5001/add-patient", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ name, age, condition }),

@@ -1,6 +1,7 @@
 'use client';
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useAuth } from "./AuthContext";
+import { io } from "socket.io-client";
 
 const ChatContext = createContext();
 
@@ -10,18 +11,90 @@ export function ChatProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const socketRef = useRef(null);
+  const currentPatientIdRef = useRef(null);
+
+  // Helper to append delta while avoiding repeated text
+  function appendDeltaSafe(currentText, delta) {
+    if (!delta) return currentText;
+
+    // Find the longest overlap between end of currentText and start of delta
+    let overlap = 0;
+    const maxOverlap = Math.min(currentText.length, delta.length);
+
+    for (let i = maxOverlap; i > 0; i--) {
+      if (currentText.endsWith(delta.slice(0, i))) {
+        overlap = i;
+        break;
+      }
+    }
+
+    return currentText + delta.slice(overlap);
+  }
+
+  // Initialize socket
+  useEffect(() => {
+    if (!authLoading && !socketRef.current) {
+      socketRef.current = io("http://127.0.0.1:5001", {
+        auth: { token: localStorage.getItem("token") },
+        transports: ["websocket"],
+      });
+      socketRef.current.on("connect_error", (err) => console.error("Socket connect error", err));
+    }
+  }, [authLoading]);
+
+  // Listen for assistant updates
+  // This useRef holds all incoming deltas in a queue
+  const deltaQueueRef = useRef([]);
+
+  useEffect(() => {
+    if (!authLoading && socketRef.current) {
+      socketRef.current.off("assistant_update");
+      socketRef.current.on("assistant_update", (chunk) => {
+        const patientId = currentPatientIdRef.current;
+        if (!patientId) return;
+
+        const delta = chunk.text_delta || "";
+        if (!delta) return;
+
+        // <-- Push the delta into the queue here
+        deltaQueueRef.current.push({ patientId, text: delta });
+      });
+    }
+  }, [authLoading]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (deltaQueueRef.current.length === 0) return;
+
+      const { patientId, text } = deltaQueueRef.current.shift();
+
+      setMessagesByPatient(prev => {
+        const updated = [...(prev[patientId] || [])];
+        let msg;
+        if (!updated.length || updated[updated.length - 1].role !== "assistant") {
+          msg = { role: "assistant", content: { text: "" } };
+          updated.push(msg);
+        } else {
+          msg = updated[updated.length - 1];
+        }
+
+        msg.content.text = appendDeltaSafe(msg.content.text, text);
+        return { ...prev, [patientId]: updated };
+      });
+    }, 50); // 50ms per chunk, adjust as needed
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Load chat history
   async function loadHistory(patientId) {
     if (!patientId || messagesByPatient[patientId]) return;
-
     setLoading(true);
     setError(null);
-
     try {
-      const data = await authFetch(`http://127.0.0.1:5000/chat-history/${patientId}`);
-      setMessagesByPatient((prev) => ({
-        ...prev,
-        [patientId]: data || [],
-      }));
+      const data = await authFetch(`http://127.0.0.1:5001/chat-history/${patientId}`);
+      setMessagesByPatient(prev => ({ ...prev, [patientId]: data || [] }));
     } catch (err) {
       console.error("Failed to fetch chat history", err);
       setError(err.message || "Unknown error");
@@ -30,54 +103,39 @@ export function ChatProvider({ children }) {
     }
   }
 
+  // Send message
   async function sendMessage(patientId, { message, file_url, file_name }) {
-    // Do nothing if both are missing
+    currentPatientIdRef.current = patientId;
     if (!message && !file_url) return;
 
-    // Optimistic UI for user
+    // Optimistic UI
     const userMessage = { role: "user", content: message || "📄 Sent file" };
-    setMessagesByPatient((prev) => ({
+    setMessagesByPatient(prev => ({
       ...prev,
       [patientId]: [...(prev[patientId] || []), userMessage],
     }));
 
     try {
-      // POST to backend
-      const data = await authFetch(`http://127.0.0.1:5000/chat/${patientId}`, {
+      const data = await authFetch(`http://127.0.0.1:5001/chat/${patientId}`, {
         method: "POST",
         body: JSON.stringify({ message, file_url, file_name }),
       });
 
-      // If backend returns assistant response, add to chat
-      if (data.response) {
-      const assistantData = data.response; // this is already JSON from backend
+      const session_id = data.session_id;
+      const eeg_summary = data.eeg_summary;
 
-      // Create a friendly object to store in state
-      const assistantMessage = {
-        role: "assistant",
-        content: assistantData.text || "",        // Markdown text
-        highlights: assistantData.highlights || [],
-        next_steps: assistantData.next_steps || [],
-        warnings: assistantData.warnings || [],
-      };
+      socketRef.current.emit("join", { session_id });
+      socketRef.current.emit("start_assistant", {
+        patient_id: patientId,
+        session_id,
+        message,
+        eeg_summary,
+        token: localStorage.getItem("token"),
+      });
 
-      setMessagesByPatient((prev) => ({
-        ...prev,
-        [patientId]: [...(prev[patientId] || []), assistantMessage],
-      }));
-    }
-
-      // If backend returns EEG summary (file only), add system message
-      if (data.eeg_summary) {
-        const systemMessage = { role: "system", content: data.eeg_summary };
-        setMessagesByPatient((prev) => ({
-          ...prev,
-          [patientId]: [...(prev[patientId] || []), systemMessage],
-        }));
-      }
     } catch (err) {
       console.error("Failed to send message", err);
-      setMessagesByPatient((prev) => ({
+      setMessagesByPatient(prev => ({
         ...prev,
         [patientId]: [
           ...(prev[patientId] || []),
@@ -90,9 +148,7 @@ export function ChatProvider({ children }) {
   if (authLoading) return null;
 
   return (
-    <ChatContext.Provider
-      value={{ messagesByPatient, loadHistory, sendMessage, loading, error }}
-    >
+    <ChatContext.Provider value={{ messagesByPatient, loadHistory, sendMessage, loading, error }}>
       {children}
     </ChatContext.Provider>
   );

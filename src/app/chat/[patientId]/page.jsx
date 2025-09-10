@@ -100,21 +100,10 @@ export default function ChatPage() {
 
                   return (
                     <div key={i} className="flex flex-col items-start gap-1">
-                      <div className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words overflow-x-hidden bg-white/70 text-black">
-                        <ReactMarkdown>{typeof msg.content === "string" ? msg.content : msg.content.text || ""}</ReactMarkdown>
-
-                        {/* Highlights */}
-                        {highlights.length > 0 && <ul>{highlights.map((h, idx) => <li key={idx}>{h}</li>)}</ul>}
-
-                        {/* Next steps */}
-                        {next_steps.length > 0 && (
-                          <p><strong>Next steps:</strong> {next_steps.join(", ")}</p>
-                        )}
-
-                        {/* Warnings */}
-                        {warnings.length > 0 && (
-                          <p style={{ color: "red" }}>{warnings.join(" | ")}</p>
-                        )}
+                      <div className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words overflow-x-hidden text-black">
+                        <ReactMarkdown>
+                          {typeof msg.content === "string" ? msg.content : msg.content.text || ""}
+                        </ReactMarkdown>
                       </div>
                       <div className="pl-2">
                         <CopyButton text={msg.content || ""} />

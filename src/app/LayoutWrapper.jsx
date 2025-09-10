@@ -141,7 +141,7 @@ function PatientGrid() {
       if (!user) return;
       const fetchPatients = async () => {
         try {
-          const data = await authFetch('http://127.0.0.1:5000/patients');
+          const data = await authFetch('http://127.0.0.1:5001/patients');
           setPatients(data);
         } catch (err) {
           console.error(err);
