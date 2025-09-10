@@ -97,7 +97,7 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full p-3 rounded-lg border text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
+            className="w-full p-3 rounded-lg border border-gray-300 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
           />
           <input
             type="number"
@@ -105,7 +105,7 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
             value={age}
             onChange={(e) => setAge(e.target.value)}
             required
-            className="w-full p-3 rounded-lg border text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
+            className="w-full p-3 rounded-lg border border-gray-300 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
           />
           <textarea
             placeholder="Condition"
@@ -113,7 +113,7 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
             onChange={(e) => setCondition(e.target.value)}
             rows={4}
             required
-            className="w-full p-3 rounded-lg border text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30 resize-none"
+            className="w-full p-3 rounded-lg border border-gray-300 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30 resize-none"
           />
 
           <div className="flex items-center justify-between mt-2">

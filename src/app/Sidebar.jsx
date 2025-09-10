@@ -7,6 +7,9 @@ import SidebarAccount from "./SidebarAccount";
 import { useRef } from "react";
 import { createPortal } from "react-dom";
 import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
+import { useParams } from "next/navigation";
+import SidebarHeader from "./SidebarHeader";
+import ConfirmDialog from "./ConfirmDialog";
 
 // ---------------------
 // Debounce hook
@@ -49,39 +52,40 @@ const SidebarItem = memo(({ icon, label, collapsed, onClick, selected }) => (
 // ---------------------
 // SidebarHeader (collapse button)
 // ---------------------
-function SidebarHeader({ collapsed, setCollapsed }) {
-  return (
-    <div className="mb-2">
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center p-1.5 rounded-lg text-black hover:bg-black/10 cursor-pointer transition-colors duration-200 w-full"
-        aria-label="Toggle sidebar"
-        aria-pressed={collapsed}
-      >
-        <span className="w-5 h-5 flex justify-center items-center flex-shrink-0 text-gray-600">
-          {collapsed ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-          )}
-        </span>
-        <span className={clsx("whitespace-nowrap overflow-hidden transition-all duration-200", collapsed ? "w-0 opacity-0 pointer-events-none ml-0" : "opacity-100 ml-2")}>
-          Collapse
-        </span>
-      </button>
-    </div>
-  );
-}
+// function SidebarHeader({ collapsed, setCollapsed }) {
+//   return (
+//     <div className="mb-2">
+//       <button
+//         onClick={() => setCollapsed(!collapsed)}
+//         className="flex items-center p-1.5 rounded-lg text-black hover:bg-black/10 cursor-pointer transition-colors duration-200 w-full"
+//         aria-label="Toggle sidebar"
+//         aria-pressed={collapsed}
+//       >
+//         <span className="w-5 h-5 flex justify-center items-center flex-shrink-0 text-gray-600">
+//           {collapsed ? (
+//             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" strokeWidth={2}>
+//               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+//             </svg>
+//           ) : (
+//             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" strokeWidth={2}>
+//               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+//             </svg>
+//           )}
+//         </span>
+//         <span className={clsx("whitespace-nowrap overflow-hidden transition-all duration-200", collapsed ? "w-0 opacity-0 pointer-events-none ml-0" : "opacity-100 ml-2")}>
+//           Collapse
+//         </span>
+//       </button>
+//     </div>
+//   );
+// }
 
 // ---------------------
 // PatientItem
 // ---------------------
 const PatientItem = ({ patient, collapsed, selectedChat, setSelectedChat }) => {
   const [openMenu, setOpenMenu] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const { refs, floatingStyles } = useFloating({
   open: openMenu,
@@ -105,15 +109,23 @@ const PatientItem = ({ patient, collapsed, selectedChat, setSelectedChat }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openMenu, refs]);
 
+  useEffect(() => {
+  if (!showConfirm) return;
+  const handleEsc = (e) => {
+    if (e.key === "Escape") setShowConfirm(false);
+  };
+  window.addEventListener("keydown", handleEsc);
+  return () => window.removeEventListener("keydown", handleEsc);
+}, [showConfirm]);
+
   return (
     <li className="relative group">
       <Link
         href={`/chat/${patient.id}`}
         ref={refs.setReference}
-        className={`flex items-center p-1.5 rounded-lg cursor-pointer transition gap-0 w-full ${
+        className={`flex items-center p-1.5 rounded-xl cursor-pointer transition gap-0 w-full ${
           selectedChat === patient.id ? "bg-white/40 shadow" : "hover:bg-black/10"
         }`}
-        onClick={() => setSelectedChat(patient.id)}
       >
         <span
           className={`whitespace-nowrap overflow-hidden transition-all duration-200 ${
@@ -126,7 +138,8 @@ const PatientItem = ({ patient, collapsed, selectedChat, setSelectedChat }) => {
         {!collapsed && (
           <button
             onClick={(e) => {
-              e.stopPropagation();
+              e.preventDefault();   // ✅ stop Link navigation
+              e.stopPropagation();  // ✅ stop Link onClick
               setOpenMenu((prev) => !prev);
             }}
             className="ml-auto p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
@@ -163,13 +176,28 @@ const PatientItem = ({ patient, collapsed, selectedChat, setSelectedChat }) => {
             </li>
             <li
               className="flex items-center gap-2 px-4 py-2 text-red-600 text-sm hover:bg-gray-100 cursor-pointer rounded-xl"
-              onClick={() => alert(`Delete ${patient.name}`)}
+              onClick={() => {
+                setOpenMenu(false);
+                setShowConfirm(true);
+              }}
             >
               Delete
             </li>
           </ul>,
           document.body
         )}
+        <ConfirmDialog
+          open={showConfirm}
+          title="Confirm Action"
+          message="Are you sure you want to perform this action?"
+          confirmLabel="Yes"
+          cancelLabel="No"
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={() => {
+            setShowConfirm(false);
+            alert(`Deleted ${patient.name}`); // 🔥 Replace with actual delete logic
+          }}
+        />
     </li>
   );
 };
@@ -178,7 +206,7 @@ const PatientItem = ({ patient, collapsed, selectedChat, setSelectedChat }) => {
 // PatientList
 // ---------------------
 export const PatientList = memo(({ patients, selectedChat, setSelectedChat, collapsed }) => (
-  <div className="mt-8">
+  <div className="mt-3">
     <h4
       className={`mb-1.5 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap ${
         collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
@@ -308,7 +336,6 @@ function SearchPopup({
                 href={`/chat/${msg.patient_id}`}
                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/60 text-black text-sm transition"
                 onClick={() => {
-                  setSelectedChat(msg.patient_id);
                   setSearchTerm("");
                   setSearchResults([]);
                   setShowSearch(false);
@@ -347,6 +374,7 @@ function SearchPopup({
 // ---------------------
 export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) {
   const { user, logout } = useAuth();
+  const { patientId } = useParams();
   const [patients, setPatients] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -355,8 +383,14 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [showBorder, setShowBorder] = useState(false);
+  const scrollContainerRef = useRef(null);
 
   const { authFetch } = useAuth();
+
+  const handleScroll = (e) => {
+    setShowBorder(e.target.scrollTop > 0);
+  };
 
   // Fetch patients securely
   useEffect(() => {
@@ -400,27 +434,33 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
         )}
         aria-label="Sidebar"
       >
-        <div className="h-full px-2 overflow-y-auto text-sm flex flex-col">
-          <SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+        <div className="h-full text-sm flex flex-col overflow-hidden">
+          <div
+              className={clsx("flex-shrink-0 px-2 overflow-hidden pb-4 pt-1 transition-colors duration-300", collapsed ? "border-transparent" : showBorder ? "border-b border-gray-300" : "border-transparent")}
+           >
+            <SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} scrollContainerRef={scrollContainerRef}/>
 
-          {/* Menu */}
-          <div className="flex flex-col gap-2">
-            <SidebarItem
-              icon={<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000ff"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>}
-              label="New patient"
-              collapsed={collapsed}
-              onClick={onNewPatientClick}
-            />
-            <SidebarItem
-              icon={<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000ff"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93ZM320-320v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T663-540L443-320H320Zm300-263-37-37 37 37ZM380-380h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg>}
-              label="Search chats"
-              collapsed={collapsed}
-              onClick={() => setShowSearch(true)}
-            />
+            {/* Menu */}
+            <div className="flex flex-col gap-2">
+              <SidebarItem
+                icon={<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000ff"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>}
+                label="New patient"
+                collapsed={collapsed}
+                onClick={onNewPatientClick}
+              />
+              <SidebarItem
+                icon={<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000ff"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93ZM320-320v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T663-540L443-320H320Zm300-263-37-37 37 37ZM380-380h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg>}
+                label="Search chats"
+                collapsed={collapsed}
+                onClick={() => setShowSearch(true)}
+              />
+            </div>
           </div>
 
           {!collapsed && user && (
-            <PatientList patients={patients} selectedChat={selectedChat} setSelectedChat={setSelectedChat} collapsed={collapsed} />
+            <div className="flex-1 overflow-y-auto px-2" onScroll={handleScroll} ref={scrollContainerRef}>
+              <PatientList patients={patients} selectedChat={patientId} collapsed={collapsed} />
+            </div>
           )}
         </div>
 

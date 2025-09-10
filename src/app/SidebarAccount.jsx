@@ -23,16 +23,6 @@ export default function SidebarAccount({ collapsed }) {
     window.location.href = "http://localhost:3000";
   };
 
-//   if (!user)
-//     return (
-//       <span
-//         className="cursor-pointer w-full flex justify-center p-2"
-//         onClick={() => alert("Please login")}
-//       >
-//         Login
-//       </span>
-//     );
-
   const initial = (user.name || user.email || "U")[0].toUpperCase();
   const colorHash = Array.from(user.email || "user").reduce(
     (acc, char) => acc + char.charCodeAt(0),

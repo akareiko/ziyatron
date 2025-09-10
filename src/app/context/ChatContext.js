@@ -50,12 +50,22 @@ export function ChatProvider({ children }) {
 
       // If backend returns assistant response, add to chat
       if (data.response) {
-        const assistantMessage = { role: "assistant", content: data.response };
-        setMessagesByPatient((prev) => ({
-          ...prev,
-          [patientId]: [...(prev[patientId] || []), assistantMessage],
-        }));
-      }
+      const assistantData = data.response; // this is already JSON from backend
+
+      // Create a friendly object to store in state
+      const assistantMessage = {
+        role: "assistant",
+        content: assistantData.text || "",        // Markdown text
+        highlights: assistantData.highlights || [],
+        next_steps: assistantData.next_steps || [],
+        warnings: assistantData.warnings || [],
+      };
+
+      setMessagesByPatient((prev) => ({
+        ...prev,
+        [patientId]: [...(prev[patientId] || []), assistantMessage],
+      }));
+    }
 
       // If backend returns EEG summary (file only), add system message
       if (data.eeg_summary) {
