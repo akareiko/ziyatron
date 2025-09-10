@@ -16,6 +16,7 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
   const prevIsBar = useRef(isBar);
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   function TooltipButton({ tooltip, children, className = "", ...props }) {
     const [open, setOpen] = useState(false);
@@ -59,16 +60,26 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
     e.target.value = "";
   };
 
-  const handleSend = () => {
-    if (!inputValue.trim() && !uploadedFile?.url) return;
-    onSend?.({
-      message: inputValue.trim(),
-      file_url: uploadedFile?.url || null,
-      file_name: uploadedFile?.name || null,
-    });
+  const handleSend = async () => {
+    if ((!inputValue.trim() && !uploadedFile?.url) || isSending || isUploading) return;
+
+    setIsSending(true); // 🚨 lock input
+    // clear input/UI
     setInputValue("");
     setUploadedFile(null);
     setUploadProgress(0);
+
+    try {
+      await onSend?.({
+        message: inputValue.trim(),
+        file_url: uploadedFile?.url || null,
+        file_name: uploadedFile?.name || null,
+      });
+    } catch (err) {
+      console.error("Send failed:", err);
+    } finally {
+      setIsSending(false); // unlock input
+    }
   };
 
   const uploadFile = (file) => {
@@ -290,23 +301,39 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
         />
         {isBar && (
           <TooltipButton
-            tooltip="Send"
+            tooltip={isSending ? "Processing..." : "Send"}
             onClick={handleSend}
-            disabled={isUploading}
+            disabled={isUploading || isSending}
             className={`p-2 rounded-full transition ${
-              isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"
+              isUploading || isSending ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"
             }`}
           >
-            <svg
-              width="20"
-              height="20"
-              fill="none"
-              stroke="black"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            {isSending ? (
+              // Pause icon
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="black"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <rect x="6" y="5" width="4" height="14" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="14" y="5" width="4" height="14" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              // Send arrow
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="black"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
           </TooltipButton>
         )}
         
@@ -333,7 +360,7 @@ export default function AskInput({ onSend, onUploadClick, externalFile = null, o
           <TooltipButton
             tooltip="Send"
             onClick={handleSend}
-            disabled={isUploading}
+            disabled={isUploading || isSending}
             className={`p-2 rounded-full transition ${
               isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"
             }`}

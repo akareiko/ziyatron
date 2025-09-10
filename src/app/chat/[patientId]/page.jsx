@@ -40,7 +40,7 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
-    if (messages.length > 0) scrollToBottom();
+    if (messages.length > 2) scrollToBottom();
   }, [messages]);
 
   return (
@@ -100,7 +100,7 @@ export default function ChatPage() {
 
                   return (
                     <div key={i} className="flex flex-col items-start gap-1">
-                      <div className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words break-all overflow-x-hidden bg-white/70 text-black">
+                      <div className="text-left px-5 py-3 rounded-2xl whitespace-pre-line leading-relaxed max-w-2xl break-words overflow-x-hidden bg-white/70 text-black">
                         <ReactMarkdown>{typeof msg.content === "string" ? msg.content : msg.content.text || ""}</ReactMarkdown>
 
                         {/* Highlights */}
@@ -126,7 +126,7 @@ export default function ChatPage() {
                 else if (msg.role === "user") {
                   return (
                     <div key={i} className="flex flex-col items-end gap-1">
-                      <div className="inline-block px-4 py-2 max-w-xs sm:max-w-md md:max-w-lg rounded-2xl text-black bg-[#243c5a]/15 break-words break-all overflow-x-hidden">
+                      <div className="inline-block px-4 py-2 max-w-xs sm:max-w-md md:max-w-lg rounded-2xl text-black bg-[#243c5a]/15 break-words overflow-x-hidden">
                         {msg.content}
                         {msg.file && (
                           <a
