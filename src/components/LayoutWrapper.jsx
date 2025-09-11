@@ -5,9 +5,9 @@ import NewPatientModal from "./NewPatientModal";
 import AskInput from "./AskInput";
 import DragDropOverlay from "./DragDropOverlay";
 import { useParams } from "next/navigation";
-import { useChat } from "./context/ChatContext";
+import { useChat } from "../context/ChatContext";
 import { useEffect } from "react";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
 import MoreOptionsDropdown from "./MoreOptionsDropdown";
 
@@ -47,7 +47,8 @@ export default function LayoutWrapper({ children }) {
   };
 
   return (
-    <div className="relative min-h-screen text-black bg-gradient-to-br from-white via-blue-200/80 to-gray-100">
+    <div className="relative min-h-screen text-black bg-white">
+      {/* <div className="relative min-h-screen text-black bg-gradient-to-br from-white via-blue-200/80 to-gray-100"> */}
       <div className="absolute inset-0 bg-white/40 backdrop-blur-xl z-0" />
       <div className="relative z-10 flex h-screen">
         {/* Sidebar */}

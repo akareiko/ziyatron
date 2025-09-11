@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from "react";
+import { registerUser, loginUser } from "../lib/api";
 
 const AuthContext = createContext();
 
@@ -21,20 +22,12 @@ export const AuthProvider = ({ children }) => {
 
   // Login with email/password
   const login = async (email, password) => {
-    const res = await fetch("http://127.0.0.1:5001/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    if (res.ok) {
+      const data = await loginUser({ email, password });
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       setToken(data.token);
       setUser(data.user);
-    } else {
-      throw new Error(data.error || "Login failed");
-    }
+    
   };
 
   // Logout

@@ -2,9 +2,9 @@
 'use client';
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
-import { storage } from "./firebase";
+import { storage } from "../lib/firebase";
 import { useFloating, offset, flip, shift, FloatingPortal } from "@floating-ui/react";
-import { useChat } from "./context/ChatContext";
+import { useChat } from "../context/ChatContext";
 
 export default function AskInput({ onSend, onUploadClick, externalFile = null, onExternalFileHandled = () => {} }) {
   const [inputValue, setInputValue] = useState("");

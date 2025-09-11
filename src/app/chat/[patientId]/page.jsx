@@ -1,8 +1,8 @@
 'use client';
-import { useChat } from '../../context/ChatContext';
+import { useChat } from '../../../context/ChatContext';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
-import CopyButton from '../../CopyButton';
+import CopyButton from '../../../components/CopyButton';
 import { useRef } from 'react';
 import ReactMarkdown from "react-markdown";
 

@@ -1,8 +1,8 @@
 'use client';
 import { useState } from "react";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import LayoutWrapper from "./LayoutWrapper";
-import { useChat } from "./context/ChatContext";
+import { useChat } from "../context/ChatContext";
 import AskInput from "./AskInput";
 import { useParams } from "next/navigation";
 import SplineBackground from "./Splinebg"; // Client-only Spline component

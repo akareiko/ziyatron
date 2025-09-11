@@ -1,8 +1,9 @@
 'use client';
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import Image from "next/image";
 import logon from "../../../public/logon.png";
+import { registerUser, sendEphemeralMessage } from "../../lib/api";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -18,7 +19,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      window.location.href = "http://localhost:3000";
+      window.location.href = "/";
     } catch (err) {
       alert(err.message);
     } finally {
@@ -30,13 +31,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:5000/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Registration failed");
+      await registerUser({ email, password, name });
       alert("Registration successful! You can now login.");
       setIsRegister(false);
       setEmail("");

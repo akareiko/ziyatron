@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import clsx from "clsx";
 import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
 
