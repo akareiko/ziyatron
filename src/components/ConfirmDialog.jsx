@@ -1,5 +1,5 @@
-// app/components/ConfirmDialog.jsx
 'use client';
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 export default function ConfirmDialog({
@@ -11,14 +11,26 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }) {
+  const dialogRef = useRef(null);
+
+  // Focus first button for accessibility
+  useEffect(() => {
+    if (open && dialogRef.current) {
+      dialogRef.current.querySelector("button")?.focus();
+    }
+  }, [open]);
+
   if (!open) return null;
 
   return createPortal(
     <div
       className="fixed inset-0 flex items-center justify-center z-50 bg-gray-100/30 backdrop-blur-[0.5px] text-black"
       onClick={onCancel}
+      role="dialog"
+      aria-modal="true"
     >
       <div
+        ref={dialogRef}
         className="w-full max-w-sm p-6 rounded-2xl bg-white flex flex-col gap-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
