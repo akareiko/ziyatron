@@ -186,7 +186,7 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
 
   return (
     <div
-      className="w-full max-w-3xl mx-auto bg-white backdrop-blur-lg border border-black/20 overflow-hidden"
+      className="w-full max-w-3xl bg-white backdrop-blur-lg border border-black/20 overflow-hidden"
       style={{
         borderRadius: isBar ? "9999px" : "1rem",
         padding: isBar ? "0.5rem 0.75rem" : "0.75rem",

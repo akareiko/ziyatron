@@ -33,7 +33,7 @@ function SidebarHeader({ collapsed, setCollapsed, scrollContainerRef }) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
           </svg> */}
 
-          <svg className="w-6 h-6" viewBox="0 0 769 602" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-5 h-5" viewBox="0 0 769 602" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M564.765 440C488.279 440 435.84 364.92 462.123 293.091L569.006 1V1C644.789 1 697.498 76.3487 671.514 147.538L564.765 440Z" fill="black"/>
             <path d="M97.6049 591C30.0284 591 -16.7693 523.535 6.90204 460.24L119 160.5C186.573 160.598 231.66 229.611 208.5 293.091L97.6049 591V591Z" fill="black"/>
             <path d="M162.18 524.022C150.415 556.612 174.56 591 209.209 591H506L517.8 561C427.804 561 367.108 471.175 397.052 386.306L509.489 67.6364C520.966 35.1062 496.833 1 462.337 1H176.8L165 31C256.831 31 305.912 123.674 275.439 210.301L162.18 524.022Z" fill="black"/>

@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
+import { addPatient } from "../lib/api";
+import { useRouter } from "next/navigation";
 
-export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
+export default function NewPatientModal({ isOpen, onClose, onNewPatientAdded }) {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [condition, setCondition] = useState("");
   const [status, setStatus] = useState("");
   const [visible, setVisible] = useState(isOpen);
   const modalRef = useRef(null);
+  const router = useRouter();
 
   // Open/close modal based on isOpen prop
   useEffect(() => {
@@ -47,25 +50,29 @@ export default function NewPatientModal({ isOpen, onClose, setSelectedChat }) {
       setStatus("No auth token found.");
       return;
     }
+
     try {
-      const res = await fetch("http://127.0.0.1:5001/add-patient", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name, age, condition }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setStatus("Saved!");
+      const res = await addPatient({ name, age, condition }, token);
+
+      if (res?.success && res?.patient) {
+        const newPatient = {
+          id: res.patient.id,
+          name: res.patient.name,
+          age: res.patient.age,
+          condition: res.patient.condition,
+        };
+
+        onNewPatientAdded?.(newPatient);
+        setStatus("Patient added successfully!");
         setName(""); setAge(""); setCondition("");
-        setTimeout(() => {
-          setStatus(""); handleClose();
-        }, 1000);
+        onClose?.();
+        router.push(`/chat/${newPatient.id}`);
       } else {
-        setStatus(data.error || "Error saving patient");
+        setStatus("Failed to create patient.");
       }
     } catch (err) {
       console.error(err);
-      setStatus("Network error");
+      setStatus("Error adding patient. Please try again.");
     }
   };
 

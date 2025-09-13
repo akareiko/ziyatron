@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
-import { useAuth } from "../context/AuthContext";
 import SidebarAccount from "./SidebarAccount";
 import { useParams } from "next/navigation";
 import SidebarHeader from "./SidebarHeader";
 import { getPatients, searchPatients } from "../lib/api";
 import SearchPopup from "./SearchPopup";
-import AuthPopup from "./AuthPopup";
 import PatientList from "./PatientList";
 import SidebarItem from "./SidebarItem";
 
@@ -24,18 +22,13 @@ function useDebounce(value, delay) {
   return debouncedValue;
 }
 
-export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) {
-  const { user, token, logout } = useAuth();
+export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, patients, setPatients, user, token, logout, error, newPatientId }) {
   const { patientId } = useParams();
-
-  const [patients, setPatients] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
-  const [error, setError] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [showBorder, setShowBorder] = useState(false);
   const scrollContainerRef = useRef(null);
@@ -43,34 +36,6 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
   const handleScroll = (e) => {
     setShowBorder(e.target.scrollTop > 0);
   };
-
-  // ---------------------
-  // Fetch patients securely
-  // ---------------------
-  useEffect(() => {
-    if (!user || !token) return;
-    let cancelled = false;
-
-    const fetchPatients = async () => {
-      try {
-        setError("");
-        const data = await getPatients(token);
-        if (!cancelled) setPatients(data);
-      } catch (err) {
-        console.error("Error fetching patients:", err);
-        if (err.message === "Unauthorized") {
-          logout();
-        } else {
-          setError("Failed to load patients.");
-        }
-      }
-    };
-
-    fetchPatients();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, token, logout]);
 
   // ---------------------
   // Search patients securely
@@ -110,7 +75,7 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
       <aside
         role="navigation"
         className={clsx(
-          "top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white/40 backdrop-blur-2xl",
+          "top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white backdrop-blur-2xl",
           collapsed
             ? ""
             : "translate-x-0 bg-[#243c5a]/15 backdrop-blur-md shadow-lg rounded-2xl"
@@ -185,21 +150,17 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
               {error && (
                 <p className="text-red-600 text-xs mb-2">{error}</p>
               )}
-              {patients.length === 0 ? (
-                <p className="text-gray-500 text-sm italic">No patients found.</p>
-              ) : (
-                <PatientList
-                  patients={patients}
-                  selectedChat={patientId}
-                  collapsed={collapsed}
-                />
-              )}
+              <PatientList
+                patients={patients}
+                selectedChat={patientId}
+                collapsed={collapsed}
+                newPatientId={newPatientId}
+              />
             </div>
           )}
         </div>
 
         <SidebarAccount
-          onClick={() => setShowAuth(true)}
           collapsed={collapsed}
         />
       </aside>
@@ -215,8 +176,6 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick }) 
           setSelectedChat={setSelectedChat}
         />
       )}
-
-      {showAuth && <AuthPopup setShowAuth={setShowAuth} />}
     </>
   );
 }

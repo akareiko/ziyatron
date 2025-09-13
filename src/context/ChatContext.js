@@ -113,8 +113,13 @@ export function ChatProvider({ children }) {
     currentPatientIdRef.current = patientId;
     if (!message && !file_url) return;
 
-    // Optimistic UI
-    const userMessage = { role: "user", content: message || "📄 Sent file" };
+    // Optimistic UI: add user message
+    const userMessage = {
+      role: "user",
+      content: message || "",
+      file: file_url ? { url: file_url, name: file_name } : null,
+    };
+
     setMessagesByPatient(prev => ({
       ...prev,
       [patientId]: [...(prev[patientId] || []), userMessage],

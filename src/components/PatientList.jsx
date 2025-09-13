@@ -1,7 +1,7 @@
 import { memo } from "react";
 import PatientItem from "./PatientItem";
 
-function PatientList({ patients, selectedChat, setSelectedChat, collapsed }) {
+function PatientList({ patients, selectedChat, setSelectedChat, collapsed, newPatientId }) {
   return (
     <div className="mt-3">
       <h4
@@ -19,6 +19,7 @@ function PatientList({ patients, selectedChat, setSelectedChat, collapsed }) {
             collapsed={collapsed}
             selectedChat={selectedChat}
             setSelectedChat={setSelectedChat}
+            isNew={p.id === newPatientId}
           />
         ))}
       </ul>

@@ -8,36 +8,45 @@ export default function PatientItem ({ patient, collapsed, selectedChat, setSele
   const [openMenu, setOpenMenu] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const { refs, floatingStyles } = useFloating({
-  open: openMenu,
-  onOpenChange: setOpenMenu,
-  placement: "top-end",
-  strategy: "fixed", // <-- ensures it won't be clipped by sidebar scroll
-  middleware: [offset(8), flip(), shift()],
-  whileElementsMounted: autoUpdate,
-});
+  // Typewriter effect
+  const [typedName, setTypedName] = useState("");
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      setTypedName(patient.name.slice(0, index + 1));
+      index++;
+      if (index === patient.name.length) clearInterval(interval);
+    }, 100); // typing speed in ms
+    return () => clearInterval(interval);
+  }, [patient.name]);
 
-  // Close on outside click
+  const { refs, floatingStyles } = useFloating({
+    open: openMenu,
+    onOpenChange: setOpenMenu,
+    placement: "top-end",
+    strategy: "fixed",
+    middleware: [offset(8), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
   useEffect(() => {
     if (!openMenu) return;
-
     const handleClickOutside = (e) => {
       if (refs.reference.current?.contains(e.target) || refs.floating.current?.contains(e.target)) return;
       setOpenMenu(false);
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openMenu, refs]);
 
   useEffect(() => {
-  if (!showConfirm) return;
-  const handleEsc = (e) => {
-    if (e.key === "Escape") setShowConfirm(false);
-  };
-  window.addEventListener("keydown", handleEsc);
-  return () => window.removeEventListener("keydown", handleEsc);
-}, [showConfirm]);
+    if (!showConfirm) return;
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setShowConfirm(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [showConfirm]);
 
   return (
     <li className="relative group">
@@ -45,7 +54,7 @@ export default function PatientItem ({ patient, collapsed, selectedChat, setSele
         href={`/chat/${patient.id}`}
         ref={refs.setReference}
         className={`flex items-center p-1.5 rounded-xl cursor-pointer transition gap-0 w-full ${
-          selectedChat === patient.id ? "bg-white/40 shadow" : "hover:bg-black/10"
+          selectedChat === patient.id ? "bg-black/5" : "hover:bg-black/5"
         }`}
       >
         <span
@@ -53,14 +62,14 @@ export default function PatientItem ({ patient, collapsed, selectedChat, setSele
             collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
           }`}
         >
-          {patient.name}
+          {typedName}
         </span>
 
         {!collapsed && (
           <button
             onClick={(e) => {
-              e.preventDefault();   // ✅ stop Link navigation
-              e.stopPropagation();  // ✅ stop Link onClick
+              e.preventDefault();
+              e.stopPropagation();
               setOpenMenu((prev) => !prev);
             }}
             className="ml-auto p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
@@ -107,18 +116,18 @@ export default function PatientItem ({ patient, collapsed, selectedChat, setSele
           </ul>,
           document.body
         )}
-        <ConfirmDialog
-          open={showConfirm}
-          title="Confirm Action"
-          message="Are you sure you want to perform this action?"
-          confirmLabel="Yes"
-          cancelLabel="No"
-          onCancel={() => setShowConfirm(false)}
-          onConfirm={() => {
-            setShowConfirm(false);
-            alert(`Deleted ${patient.name}`); // 🔥 Replace with actual delete logic
-          }}
-        />
+      <ConfirmDialog
+        open={showConfirm}
+        title="Confirm Action"
+        message="Are you sure you want to perform this action?"
+        confirmLabel="Yes"
+        cancelLabel="No"
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={() => {
+          setShowConfirm(false);
+          alert(`Deleted ${patient.name}`);
+        }}
+      />
     </li>
   );
 };

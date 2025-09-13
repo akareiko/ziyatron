@@ -73,3 +73,13 @@ export async function getPatients(token) {
 export async function searchPatients(query, token) {
   return authFetch(`${API_URL}/search?q=${encodeURIComponent(query)}`, token);
 }
+
+/* ------------------------
+   Patient Details API
+------------------------ */
+export async function addPatient({ name, age, condition }, token) {
+  return authFetch(`${API_URL}/add-patient`, token, {
+    method: "POST",
+    body: JSON.stringify({ name, age, condition }),
+  });
+}

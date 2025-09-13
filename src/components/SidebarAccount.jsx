@@ -72,7 +72,7 @@ export default function SidebarAccount({ collapsed }) {
       <div className="relative w-full" ref={refs.setReference}>
         <div
           onClick={() => setOpen((prev) => !prev)}
-          className="flex items-center h-12 px-3.5 rounded-lg transition-colors duration-200 cursor-pointer hover:bg-black/10 w-full"
+          className="flex items-center h-12 px-3.5 rounded-xl transition-colors duration-200 cursor-pointer hover:bg-black/10 w-full"
         >
           {/* Avatar */}
           <div

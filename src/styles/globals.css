@@ -1,32 +1,29 @@
 /* Applies to everything */
 @import "tailwindcss";
 
-::-webkit-scrollbar {
-  width: 10px; /* width of the scrollbar */
+.scroll-container {
+  overflow: auto;
+  scrollbar-width: thin;           /* Firefox */
+  scrollbar-color: transparent transparent; /* Firefox */
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05); /* track (background) */
-  border-radius: 10px;
+/* Webkit browsers */
+.scroll-container::-webkit-scrollbar {
+  width: 8px;                      /* or 0 to hide completely */
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.4); /* handle */
-  border-radius: 10px;
-  border: 2px solid transparent; /* makes it look inset */
-  background-clip: padding-box;
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.6); /* on hover */
+.scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
 }
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
