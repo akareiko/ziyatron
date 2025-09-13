@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from "react";
-import { registerUser, loginUser } from "../lib/api";
+import { loginUser, authFetch as apiAuthFetch } from "../lib/api";
+
 
 const AuthContext = createContext();
 
@@ -22,12 +23,11 @@ export const AuthProvider = ({ children }) => {
 
   // Login with email/password
   const login = async (email, password) => {
-      const data = await loginUser({ email, password });
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      setToken(data.token);
-      setUser(data.user);
-    
+    const data = await loginUser({ email, password });
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setToken(data.token);
+    setUser(data.user);
   };
 
   // Logout
@@ -39,22 +39,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Protected fetch wrapper
-  const authFetch = async (url, options = {}) => {
-    if (!token) throw new Error("Unauthorized");
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    if (res.status === 401) {
-      logout();
-      throw new Error("Unauthorized");
-    }
-    return res.json();
-  };
+    const authFetch = (url, options = {}) => apiAuthFetch(url, token, options);
 
   return (
     <AuthContext.Provider value={{ user, token, loading, login, logout, authFetch }}>
