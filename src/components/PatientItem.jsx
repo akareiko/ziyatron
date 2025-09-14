@@ -4,21 +4,25 @@ import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react
 import { createPortal } from "react-dom";
 import ConfirmDialog from "./ConfirmDialog";
 
-export default function PatientItem ({ patient, collapsed, selectedChat, setSelectedChat }) {
+export default function PatientItem ({ patient, collapsed, selectedChat, isNew }) {
   const [openMenu, setOpenMenu] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Typewriter effect
-  const [typedName, setTypedName] = useState("");
+  const [typedName, setTypedName] = useState(isNew ? "" : patient.name);
+
   useEffect(() => {
+    if (!isNew) return; // only run effect for new patient
+
     let index = 0;
     const interval = setInterval(() => {
       setTypedName(patient.name.slice(0, index + 1));
       index++;
       if (index === patient.name.length) clearInterval(interval);
-    }, 100); // typing speed in ms
+    }, 100);
+
     return () => clearInterval(interval);
-  }, [patient.name]);
+  }, [isNew, patient.name]);
 
   const { refs, floatingStyles } = useFloating({
     open: openMenu,

@@ -35,7 +35,12 @@ export default function LayoutWrapper({ children }) {
         setError("");
         const data = await getPatients(token);
         const patientsWithId = data.map((p, idx) => ({ ...p, _key: p.id || idx }));
-        if (!cancelled) setPatients(patientsWithId);
+        if (!cancelled) {
+          const sorted = patientsWithId.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setPatients(sorted);
+        }
       } catch (err) {
         console.error("Error fetching patients:", err);
         if (err.message === "Unauthorized") {
@@ -53,7 +58,7 @@ export default function LayoutWrapper({ children }) {
   }, [user, token, logout]);
 
   return (
-    <div className="relative min-h-screen text-black bg-gradient-to-br from-white via-blue-200/40 to-gray-100">
+    <div className="relative min-h-screen text-black bg-gradient-to-br from-gray-200 via-gray-500/40 to-gray-300">
       <div className="relative z-10 flex h-screen">
 
         {/* Sidebar */}
