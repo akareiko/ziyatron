@@ -22,7 +22,7 @@ function useDebounce(value, delay) {
   return debouncedValue;
 }
 
-export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, patients, setPatients, user, token, logout, error, newPatientId }) {
+export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, patients, setPatients, user, token, logout, error, setError, newPatientId }) {
   const { patientId } = useParams();
   const [selectedChat, setSelectedChat] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -74,12 +74,7 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, pa
     <>
       <aside
         role="navigation"
-        className={clsx(
-          "top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white backdrop-blur-2xl",
-          collapsed
-            ? ""
-            : "translate-x-0 bg-[#243c5a]/15 backdrop-blur-md shadow-lg rounded-2xl"
-        )}
+        className="top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white backdrop-blur-2xl border border-gray-300"
         aria-label="Sidebar"
       >
         <div className="h-full text-sm flex flex-col overflow-hidden">

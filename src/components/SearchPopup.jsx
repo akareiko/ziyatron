@@ -35,12 +35,12 @@ export default function SearchPopup({
     <div className="fixed inset-0 flex items-center justify-center z-50" tabIndex={-1}>
       <div
         ref={popupRef}
-        className="w-full max-w-xl bg-white/30 backdrop-blur-xl p-8 rounded-2xl shadow-2xl h-[80vh] flex flex-col relative"
+        className="w-full max-w-xl bg-white/30 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-2xl h-[50vh] flex flex-col relative"
       >
         {/* Close button */}
         <button
           onClick={() => setShowSearch(false)}
-          className="absolute top-2 right-2 p-2 rounded-full hover:bg-black/10 transition"
+          className="absolute top-2.5 right-2.5 p-2 rounded-full hover:bg-black/10 transition"
           aria-label="Close search"
         >
           <svg
@@ -60,17 +60,17 @@ export default function SearchPopup({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search patient chats..."
-          className="w-full p-3 mt-4 rounded-lg border text-black placeholder-gray-700 focus:outline-none"
+          className="w-full p-5 border-b border-gray-300 text-black placeholder-gray-700 focus:outline-none"
         />
 
-        <div className="mt-6 flex-1 overflow-y-auto space-y-2">
+        <div className="flex-1 overflow-y-auto space-y-2">
           {loadingSearch && <div className="text-gray-600">Searching...</div>}
           {searchResults.length > 0 &&
             searchResults.map((msg) => (
               <Link
                 key={msg.message_id || msg.patient_id}
                 href={`/chat/${msg.patient_id}`}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/60 text-black text-sm transition"
+                className="flex items-center gap-3 m-2 p-3 rounded-xl hover:bg-black/5 text-black text-sm transition"
                 onClick={() => {
                   setSearchTerm("");
                   setSearchResults([]);

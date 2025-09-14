@@ -74,6 +74,7 @@ export default function LayoutWrapper({ children }) {
             token={token}
             logout={logout}
             error={error}
+            setError={setError}
             newPatientId={newPatientId}
           />
         </div>

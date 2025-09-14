@@ -19,7 +19,7 @@ export default function ChatHeader({ title }) {
 
   return (
     <div className="flex items-center justify-between pb-4 mb-0 border-b border-gray-300">
-      <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+      <h2 className="text-lg font-light text-black">{title}</h2>
 
       {patientId && (
         <div className="flex items-center gap-3">

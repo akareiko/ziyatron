@@ -54,8 +54,14 @@ export default function DragDropOverlay({ onFileDrop, enabled = true }) {
 
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
-        // Pass first file
-        onFileDrop?.(files[0]);
+        const file = files[0];
+
+        // Only allow .edf files
+        if (file.name.toLowerCase().endsWith('.edf')) {
+          onFileDrop?.(file);
+        } else {
+          alert('Only .EDF files are supported!');
+        }
         e.dataTransfer.clearData();
       }
     };

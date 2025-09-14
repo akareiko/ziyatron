@@ -83,7 +83,7 @@ export default function NewPatientModal({ isOpen, onClose, onNewPatientAdded }) 
       {/* Click-outside wrapper */}
       <div 
         ref={modalRef}
-        className="w-full max-w-xl p-6 rounded-2xl bg-white/30 backdrop-blur-xl shadow-2xl flex flex-col relative"
+        className="w-full max-w-lg p-4 border border-gray-300 rounded-3xl bg-white/30 backdrop-blur-xl shadow-2xl flex flex-col relative"
       >
         <button
           onClick={handleClose}
@@ -95,39 +95,49 @@ export default function NewPatientModal({ isOpen, onClose, onNewPatientAdded }) 
           </svg>
         </button>
 
-        <h2 className="text-xl font-light mb-4">New Patient</h2>
+        <h2 className="text-xl font-light">Add new patient</h2>
+        <h3 className="text-sm font-light mb-3">Please fill in the details below:</h3>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full p-3 rounded-lg border border-gray-300 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
-          />
-          <input
-            type="number"
-            placeholder="Age"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            required
-            className="w-full p-3 rounded-lg border border-gray-300 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30"
-          />
-          <textarea
-            placeholder="Condition"
-            value={condition}
-            onChange={(e) => setCondition(e.target.value)}
-            rows={4}
-            required
-            className="w-full p-3 rounded-lg border border-gray-300 text-black placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-black/30 resize-none"
-          />
+          <div>
+            <h2 className="text-sm font-bold">Patient Name</h2>
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full p-2 text-sm rounded-lg border border-gray-300 text-black placeholder-gray-300 focus:outline-none"
+            />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold">Patient Age</h2>
+            <input
+              type="number"
+              placeholder="Age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              required
+              className="w-full p-2 text-sm rounded-lg border border-gray-300 text-black placeholder-gray-300 focus:outline-none"
+            />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold">Medical Condition</h2>
+            <textarea
+              placeholder="Condition"
+              value={condition}
+              onChange={(e) => setCondition(e.target.value)}
+              rows={4}
+              required
+              className="w-full p-2 text-sm rounded-lg border border-gray-300 text-black placeholder-gray-300 focus:outline-none resize-none"
+            />
+          </div>
 
           <div className="flex items-center justify-between mt-2">
             <span className="text-sm text-green-600">{status}</span>
             <button
               type="submit"
-              className="px-6 py-2 rounded-lg bg-black/70 text-white hover:bg-black/90"
+              className="px-6 py-2 rounded-full bg-black text-white hover:bg-black/90"
             >
               Save
             </button>

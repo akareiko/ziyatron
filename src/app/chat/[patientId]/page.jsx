@@ -26,6 +26,14 @@ export default function ChatPage() {
   const lastUserMessageRef = useRef(null);
   const lastUserMessageIndexRef = useRef(-1);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (patientId) {
+      setIsLoading(true);
+      loadHistory(patientId).finally(() => setIsLoading(false));
+    }
+  }, [patientId]);
 
   useEffect(() => {
     if (patientId) {
@@ -56,11 +64,16 @@ export default function ChatPage() {
   }, [messages, isStreaming]);
 
   return (
-    <div className="min-h-screen text-black font-sans">
+    <div className="text-black font-sans">
       {error && <p className="text-red-400">Error: {error}</p>}
 
       <div className="space-y-6 max-w-3xl pt-4">
-        {messages.length > 0 ? (
+
+        {isLoading ? (
+          <div>
+
+          </div>
+        ) : messages.length > 0 ? (
           <div className="flex flex-col gap-4">
             {messages.map((msg, i) => {
               const isAssistant = msg.role === "assistant";
@@ -105,14 +118,17 @@ export default function ChatPage() {
                 </div>
               </div>
             )}
-            <div style={{ height: "100vh" }} />
+            {/* Conditional 100vh spacer: only if at least 2 user messages */}
+            {messages.filter(m => m.role === "user").length >= 2 && (
+              <div style={{ height: "70vh" }} />
+            )}
             <div ref={messagesEndRef}></div>
           </div>
         ) : (
           // 👇 Empty state when no chat history
-          <div className="flex flex-col items-center justify-center h-[70vh] text-center text-gray-500">
-            <h2 className="text-2xl font-semibold mb-2">👋 Let’s start</h2>
-            <p className="text-base">No messages yet with this patient.</p>
+          <div className="flex flex-col items-center justify-center h-[70vh] text-center text-black">
+            <h2 className="text-2xl font-semibold mb-2">Let’s start</h2>
+            <p className="text-base">No messages yet for this patient.</p>
             <p className="text-sm text-gray-400 mt-1">Start typing below to begin the conversation.</p>
           </div>
         )}

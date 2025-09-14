@@ -16,11 +16,11 @@ function SidebarItem ({ icon, label, collapsed, onClick, selected }) {
             <span className="w-5 h-5 flex justify-center items-center flex-shrink-0">{icon}</span>
             <span
             className={clsx(
-                "whitespace-nowrap overflow-hidden transition-all duration-200",
-                collapsed ? "w-0 opacity-0 pointer-events-none ml-0" : "opacity-100 ml-2"
+                "whitespace-nowrap overflow-hidden transition-all duration-200 ml-2",
+                collapsed ? "w-0 opacity-0 pointer-events-none" : "opacity-100"
             )}
             >
-            {label}
+                {label}
             </span>
         </div>
     );
