@@ -1,15 +1,8 @@
 import PatientGrid from "./PatientGrid";
-import NewPatientModal from "./NewPatientModal";
 
 export default function Dashboard({showModal, setShowModal, onNewPatientAdded}) {
     return (
         <>
-            <NewPatientModal
-            isOpen={showModal}
-            onClose={() => setShowModal(false)}
-            onNewPatientAdded={onNewPatientAdded}
-            />
-
             <div className="flex flex-col items-start w-full max-w-6xl mx-auto px-6 mt-16 space-y-8">
                 {/* Header */}
                 <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

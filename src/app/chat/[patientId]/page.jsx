@@ -1,10 +1,11 @@
 'use client';
-import { Copy } from 'lucide-react';
 import { useChat } from '../../../context/ChatContext';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from "react-markdown";
-import CopyButton from '../../../components/CopyButton';
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
+
 
 function TypingIndicator() {
   return (
@@ -91,7 +92,7 @@ export default function ChatPage() {
                 >
                   {isAssistant ? (
                       <div className="w-full break-words text-black">
-                        <ReactMarkdown>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                           {typeof msg.content === "string" ? msg.content : msg.content.text || ""}
                         </ReactMarkdown>
                       </div>

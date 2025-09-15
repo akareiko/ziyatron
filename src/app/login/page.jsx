@@ -59,18 +59,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-row items-center justify-center min-h-screen bg-white">
-      <Image
-        src={logon}
-        alt="Ziyatron Logo"
-        width={500}
-        height={500}
-        priority
-        className="mb-6 mr-20"
-      />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+      <span className="absolute flex flex-row items-center top-10">
+        <svg width="24px" height="24px" viewBox="0 0 679 592" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M564.765 440C488.279 440 435.84 364.92 462.123 293.091L569.006 1V1C644.789 1 697.498 76.3487 671.514 147.538L564.765 440Z" fill="black"/>
+          <path d="M97.6049 591C30.0284 591 -16.7693 523.535 6.90204 460.24L119 160.5C186.573 160.598 231.66 229.611 208.5 293.091L97.6049 591V591Z" fill="black"/>
+          <path d="M162.18 524.022C150.415 556.612 174.56 591 209.209 591H506L517.8 561C427.804 561 367.108 471.175 397.052 386.306L509.489 67.6364C520.966 35.1062 496.833 1 462.337 1H176.8L165 31C256.831 31 305.912 123.674 275.439 210.301L162.18 524.022Z" fill="black"/>
+          <path d="M564.765 440C488.279 440 435.84 364.92 462.123 293.091L569.006 1V1C644.789 1 697.498 76.3487 671.514 147.538L564.765 440Z" stroke="black"/>
+          <path d="M97.6049 591C30.0284 591 -16.7693 523.535 6.90204 460.24L119 160.5C186.573 160.598 231.66 229.611 208.5 293.091L97.6049 591V591Z" stroke="black"/>
+          <path d="M162.18 524.022C150.415 556.612 174.56 591 209.209 591H506L517.8 561C427.804 561 367.108 471.175 397.052 386.306L509.489 67.6364C520.966 35.1062 496.833 1 462.337 1H176.8L165 31C256.831 31 305.912 123.674 275.439 210.301L162.18 524.022Z" stroke="black"/>
+        </svg>
+        <p className="text-2xl ml-2 text-black font-bold">Ziyatron</p>
+      </span>
 
-      <div className="p-6 rounded-2xl w-full max-w-sm flex flex-col gap-4 text-black shadow-lg">
-        <h2 className="text-2xl font-semibold text-center">Ziyatron</h2>
+      <p className="text-5xl mt-10 ml-2 text-black font-bold">Ready to dive in?</p>
+
+      <div className="p-6 mt-10 border border-gray-300 rounded-2xl w-full max-w-sm flex flex-col gap-4 text-black shadow-lg">
+        <h2 className="text-2xl text-center">Login</h2>
 
         {/* Error / Success Messages */}
         {error && (

@@ -34,7 +34,7 @@ export default function PatientGrid() {
             href={`/chat/${p.id}`}
             className="relative z-10 p-4 bg-gray-100 rounded-xl hover:bg-white cursor-pointer border border-gray-300 h-32 flex flex-col justify-between transition-all duration-200"
           >
-            <p className="font-medium truncate">{p.name}</p>
+            <p className=" font-bold truncate">{p.name}</p>
             <p className="text-sm text-gray-500 line-clamp-2">{p.condition}</p>
           </Link>
         </div>
