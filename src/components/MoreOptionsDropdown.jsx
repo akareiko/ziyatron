@@ -36,9 +36,9 @@ export default function MoreOptionsDropdown({ patient = null }) {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          height="24px"
+          height="18px"
           viewBox="0 -960 960 960"
-          width="24px"
+          width="18px"
           fill="#000000ff"
         >
           <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 

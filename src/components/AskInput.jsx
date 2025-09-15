@@ -223,7 +223,7 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
         </div>
       )}
 
-      <div className={`flex items-center gap-2 ${isBar ? "" : "mb-2"}`}>
+      <div className={`flex  gap-2 ${isBar ? "items-center" : " flex-col"}`}>
         {isBar && (
           <TooltipButton tooltip="Upload" onClick={handleUploadClick} className="p-2 rounded-full hover:bg-black/10 transition">
             <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
@@ -237,7 +237,7 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
           placeholder="Type or drop a file..."
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
           onChange={(e) => setInputValue(e.target.value)}
-          className="flex-1 resize-none bg-transparent outline-none text-black placeholder-gray scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent"
+          className={`resize-none bg-transparent outline-none text-black placeholder-gray scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent ${isBar ? "flex-1" : "w-full"}`}
           style={{ maxHeight: "150px", minHeight: "1.5rem"}}
           rows={1}
         />
@@ -259,6 +259,32 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
               </svg>
             )}
           </TooltipButton>
+        )}
+        {!isBar && (
+          <div className="flex flex-row justify-between w-full">
+            <TooltipButton tooltip="Upload" onClick={handleUploadClick} className="p-2 rounded-full hover:bg-black/10 transition">
+              <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M12 4v16M4 12h16" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </TooltipButton>
+            <TooltipButton
+              tooltip={isSending ? "Processing..." : "Send"}
+              onClick={handleSend}
+              disabled={isUploading || isSending || isStreaming}
+              className={`p-2 rounded-full transition ${isUploading || isSending || isStreaming ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"}`}
+            >
+              {isStreaming ? (
+                <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="6" y="5" width="4" height="14" strokeLinecap="round" strokeLinejoin="round"/>
+                  <rect x="14" y="5" width="4" height="14" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : (
+                <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </TooltipButton>
+          </div>
         )}
       </div>
     </div>

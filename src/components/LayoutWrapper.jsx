@@ -23,6 +23,8 @@ export default function LayoutWrapper({ children }) {
   const { user, token, logout } = useAuth();
   const [error, setError] = useState("");
   const [newPatientId, setNewPatientId] = useState(null);
+  const currentPatient = patients.find(p => String(p.id) === String(patientId));
+
   // ---------------------
   // Fetch patients securely
   // ---------------------
@@ -91,6 +93,7 @@ export default function LayoutWrapper({ children }) {
               setPatients((prev) => [newPatient, ...prev]); // prepend new patient
               setNewPatientId(newPatient.id);
             }}
+            patient={currentPatient}
           >
             {children}
           </RightPanel>

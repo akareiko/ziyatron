@@ -1,8 +1,10 @@
 'use client';
+import { Copy } from 'lucide-react';
 import { useChat } from '../../../context/ChatContext';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from "react-markdown";
+import CopyButton from '../../../components/CopyButton';
 
 function TypingIndicator() {
   return (
@@ -88,11 +90,11 @@ export default function ChatPage() {
                   style={msg.role === "user" ? { scrollMarginTop: "1rem" } : {}}
                 >
                   {isAssistant ? (
-                    <div className="w-full break-words text-black">
-                      <ReactMarkdown>
-                        {typeof msg.content === "string" ? msg.content : msg.content.text || ""}
-                      </ReactMarkdown>
-                    </div>
+                      <div className="w-full break-words text-black">
+                        <ReactMarkdown>
+                          {typeof msg.content === "string" ? msg.content : msg.content.text || ""}
+                        </ReactMarkdown>
+                      </div>
                   ) : (
                     <div className="rounded-2xl px-4 py-2 break-words max-w-full sm:max-w-[75%] bg-black/5 text-black space-y-2">
                       {msg.content && <p>{msg.content}</p>}

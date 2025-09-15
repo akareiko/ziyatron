@@ -54,7 +54,7 @@ function AskInputWrapper({ patientId, externalFile, clearExternalFile }) {
 }
 
 
-export default function RightPanel( { children, patientId, externalFile, clearExternalFile, showModal, setShowModal, onNewPatientAdded } ) {
+export default function RightPanel( { children, patientId, externalFile, clearExternalFile, showModal, setShowModal, onNewPatientAdded, patient } ) {
   return (
     <>
      <NewPatientModal
@@ -63,8 +63,8 @@ export default function RightPanel( { children, patientId, externalFile, clearEx
       onNewPatientAdded={onNewPatientAdded}
     />
     
-    <div className="relative rounded-3xl border border-gray-300 m-4 shadow-lg bg-white backdrop-blur-2xl flex flex-col h-full pt-4 pr-6 pl-6 pb-12" style={{ height: 'calc(100% - 2rem)' }}>
-      <ChatHeader title="Ziyatron" patientId={patientId} />
+    <div className="relative rounded-3xl border border-gray-300 m-4 shadow-lg bg-white backdrop-blur-2xl flex flex-col h-full pt-2 pr-6 pl-6 pb-12" style={{ height: 'calc(100% - 2rem)' }}>
+      <ChatHeader title={patient.name} patientId={patientId} />
 
       <div className="overflow-auto flex flex-col items-center">
           <div className="w-full max-w-3xl">
