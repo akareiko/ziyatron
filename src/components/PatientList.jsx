@@ -5,7 +5,7 @@ function PatientList({ patients, selectedChat, setSelectedChat, collapsed, newPa
   return (
     <div className="mt-3">
       <h4
-        className={`mb-1.5 p-1.5 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap ${
+        className={`p-2 text-gray-500 transition-all duration-200 overflow-hidden whitespace-nowrap ${
           collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
         }`}
       >

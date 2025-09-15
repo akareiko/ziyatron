@@ -23,7 +23,6 @@ export default function LayoutWrapper({ children }) {
   const { user, token, logout } = useAuth();
   const [error, setError] = useState("");
   const [newPatientId, setNewPatientId] = useState(null);
-  const currentPatient = patients.find(p => String(p.id) === String(patientId));
 
   // ---------------------
   // Fetch patients securely
@@ -60,7 +59,8 @@ export default function LayoutWrapper({ children }) {
   }, [user, token, logout]);
 
   return (
-    <div className="relative min-h-screen text-black bg-gradient-to-br from-gray-200 via-gray-500/40 to-gray-300">
+    <div className="relative min-h-screen text-black bg-gray-100">
+      {/* <div className="relative min-h-screen text-black bg-gradient-to-br from-gray-200 via-gray-500/40 to-gray-300"> */}
       <div className="relative z-10 flex h-screen">
 
         {/* Sidebar */}
@@ -93,7 +93,6 @@ export default function LayoutWrapper({ children }) {
               setPatients((prev) => [newPatient, ...prev]); // prepend new patient
               setNewPatientId(newPatient.id);
             }}
-            patient={currentPatient}
           >
             {children}
           </RightPanel>

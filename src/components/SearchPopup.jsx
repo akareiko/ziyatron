@@ -64,7 +64,7 @@ export default function SearchPopup({
         />
 
         <div className="flex-1 overflow-y-auto space-y-2">
-          {loadingSearch && <div className="text-gray-600">Searching...</div>}
+          {/* {loadingSearch && <div className="text-gray-600">Searching...</div>} */}
           {searchResults.length > 0 &&
             searchResults.map((msg) => (
               <Link
@@ -95,7 +95,7 @@ export default function SearchPopup({
                 </span>
                 <span className="font-medium">{msg.patient_name || msg.role || "Unknown Patient"}</span>
                 <span className="text-gray-600 truncate flex-1">
-                  {msg.content.slice(0, 60)}...
+                  {typeof msg.content === "string" ? msg.content.slice(0, 60) : JSON.stringify(msg.content).slice(0, 60)}...
                 </span>
               </Link>
             ))}

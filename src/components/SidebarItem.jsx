@@ -9,7 +9,7 @@ function SidebarItem ({ icon, label, collapsed, onClick, selected }) {
             role="button"
             tabIndex={0}
             className={clsx(
-            "flex items-center p-1.5 rounded-xl text-black cursor-pointer transition-colors duration-200 hover:bg-black/10 w-full",
+            "flex items-center p-2 rounded-xl text-black cursor-pointer transition-colors duration-200 hover:bg-black/5 w-full",
             selected && "bg-white/40 shadow"
             )}
         >

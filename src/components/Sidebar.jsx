@@ -95,7 +95,7 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, pa
               scrollContainerRef={scrollContainerRef}
             />
 
-            <div className="flex flex-col gap-2 mt-2">
+            <div className="flex flex-col">
               <SidebarItem
                 icon={
                   <svg

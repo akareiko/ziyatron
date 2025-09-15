@@ -160,20 +160,28 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
     const el = textareaRef.current;
     if (!el) return;
 
+    // Auto-expand height
     el.style.height = "auto";
     el.style.height = Math.min(el.scrollHeight, 150) + "px";
 
+    // Detect line wrapping (i.e. when text exceeds width)
     const lineHeight = parseInt(window.getComputedStyle(el).lineHeight, 10) || 20;
     const visibleLines = Math.ceil(el.scrollHeight / lineHeight);
 
-    const newIsBar = (inputValue.trim() === "" && !uploadedFile) || (visibleLines <= 1 && !uploadedFile);
-
-    if (prevIsBar.current !== newIsBar) {
-      setIsBar(newIsBar);
-      prevIsBar.current = newIsBar;
-      setTransitionEnabled(true);
+    // --- New rules ---
+    if (!isBar) {
+      // Stay expanded until fully cleared
+      if (inputValue.trim() === "" && !uploadedFile) {
+        setIsBar(true);
+      }
+      return;
     }
-  }, [inputValue, uploadedFile]);
+
+    // If compact, expand only when wrapping starts or file exists
+    if (visibleLines > 1 || uploadedFile) {
+      setIsBar(false);
+    }
+  }, [inputValue, uploadedFile, isBar]);
 
   // -------------------------
   // Handle external file
@@ -188,9 +196,9 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
     <div
       className="w-full max-w-3xl bg-white backdrop-blur-lg border border-black/20 overflow-hidden"
       style={{
-        borderRadius: isBar ? "9999px" : "1rem",
+        borderRadius: isBar ? "9999px" : "1.5rem",
         padding: isBar ? "0.5rem 0.75rem" : "0.75rem",
-        transition: transitionEnabled ? "border-radius 0.3s ease, padding 0.3s ease" : "none",
+        transition: transitionEnabled ? "border-radius linear, padding 0.2s ease" : "none",
       }}
     >
       <input

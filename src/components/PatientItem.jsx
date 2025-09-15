@@ -57,7 +57,7 @@ export default function PatientItem ({ patient, collapsed, selectedChat, isNew }
       <Link
         href={`/chat/${patient.id}`}
         ref={refs.setReference}
-        className={`flex items-center p-1.5 rounded-xl cursor-pointer transition gap-0 w-full ${
+        className={`flex items-center p-2 rounded-xl cursor-pointer transition gap-0 w-full ${
           selectedChat === patient.id ? "bg-black/5" : "hover:bg-black/5"
         }`}
       >
@@ -76,7 +76,7 @@ export default function PatientItem ({ patient, collapsed, selectedChat, isNew }
               e.stopPropagation();
               setOpenMenu((prev) => !prev);
             }}
-            className="ml-auto p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
+            className="ml-auto rounded-full opacity-0 group-hover:opacity-100 transition"
             aria-label="More options"
           >
             <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentcolor">
