@@ -14,22 +14,41 @@ export function ChatProvider({ children }) {
   const socketRef = useRef(null);
   const currentPatientIdRef = useRef(null);
 
-  // Helper to append delta while avoiding repeated text
+  function sanitizeDeltaForMarkdown(currentText, delta) {
+    if (!delta) return delta;
+
+    // remove zero-width, BOM, NBSP
+    delta = delta.replace(/\u200B/g, '').replace(/\uFEFF/g, '').replace(/\u00A0/g, ' ');
+
+    // If delta begins with heading/list marker and currentText doesn't end with newline, add newline
+    if (/^\s*(#{1,6}\s+|- |\* |\d+\.\s+|> )/.test(delta) && !currentText.endsWith('\n')) {
+      delta = '\n' + delta.trimStart();
+    }
+
+    // If a heading/list token appears after non-newline text within the chunk, insert newline before it
+    delta = delta.replace(/(?<!\n)\s+(?=(#{1,6}\s+|- |\* |\d+\.\s+|> ))/g, '\n');
+
+    return delta;
+  }
+
   function appendDeltaSafe(currentText, delta) {
     if (!delta) return currentText;
 
-    // Find the longest overlap between end of currentText and start of delta
+    // sanitize first
+    const sanitized = sanitizeDeltaForMarkdown(currentText, delta);
+
+    // then existing overlap logic
     let overlap = 0;
-    const maxOverlap = Math.min(currentText.length, delta.length);
+    const maxOverlap = Math.min(currentText.length, sanitized.length);
 
     for (let i = maxOverlap; i > 0; i--) {
-      if (currentText.endsWith(delta.slice(0, i))) {
+      if (currentText.endsWith(sanitized.slice(0, i))) {
         overlap = i;
         break;
       }
     }
 
-    return currentText + delta.slice(overlap);
+    return currentText + sanitized.slice(overlap);
   }
 
   // Initialize socket

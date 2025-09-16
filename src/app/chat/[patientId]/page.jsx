@@ -83,6 +83,11 @@ export default function ChatPage() {
               const isLastUserMessage =
                 msg.role === "user" &&
                 i === messages.map((m) => m.role === "user" ? i : -1).filter(j => j !== -1).pop();
+              const text = typeof msg.content === "string" ? msg.content : msg.content.text || "";
+              if (isAssistant) {
+                console.log("RAW MARKDOWN:", JSON.stringify(text));
+                console.log("CODES:", Array.from(text.slice(0, 50)).map(c => c.charCodeAt(0)));
+              }
               return (
                 <div
                   key={i}
@@ -92,9 +97,13 @@ export default function ChatPage() {
                 >
                   {isAssistant ? (
                       <div className="w-full break-words text-black">
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
-                          {typeof msg.content === "string" ? msg.content : msg.content.text || ""}
-                        </ReactMarkdown>
+                        <div className="prose prose-slate max-w-none">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkBreaks]}
+                          >
+                            {(typeof msg.content === "string" ? msg.content : msg.content.text) || ""}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                   ) : (
                     <div className="rounded-2xl px-4 py-2 break-words max-w-full sm:max-w-[75%] bg-black/5 text-black space-y-2">
