@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Aleo, Rubik } from "next/font/google";
 import "../styles/globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { ChatProvider } from "../context/ChatContext";
@@ -10,6 +10,16 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const aleo = Aleo({
+  variable: "--font-aleo",
+  subsets: ["latin"],
+});
+
+const rubik = Rubik({
+  variable: "--font-rubik",
   subsets: ["latin"],
 });
 
@@ -46,7 +56,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" dir="ltr">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${aleo.variable} ${rubik.variable} antialiased`}>
         <AuthProvider>
           <ChatProvider>
             {children}

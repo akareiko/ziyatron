@@ -56,3 +56,11 @@ body {
 .prose li {
   margin: 0.25rem 0;
 }
+
+.aleo-text {
+  font-family: var(--font-aleo), serif;
+}
+
+.rubik-text {
+  font-family: var(--font-rubik), serif;
+}

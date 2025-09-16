@@ -7,7 +7,7 @@ import PresentationPage from "./components/PresentationPage"
 
 export default function Home() {
   return (
-    <main>
+    <main className="rubik-text">
       <Scroll />
       <LayoutGridDemo />
       <ReportIntro />

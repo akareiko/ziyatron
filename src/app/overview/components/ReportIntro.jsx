@@ -7,7 +7,6 @@ const ReportIntro = () => {
   return (
     <div
       className="relative w-full min-h-screen bg-white overflow-hidden" id="end"
-      style={{ fontFamily: "Courier, Courier New, monospace" }}
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
@@ -26,7 +25,6 @@ const ReportIntro = () => {
       <div className="relative z-10 flex flex-col items-center justify-center h-screen text-center text-black px-6">
         <h1
           className="text-4xl md:text-[4rem] font-bold mb-4 leading-none"
-          style={{ fontFamily: "Courier, Courier New, monospace" }}
         >
           Ziyatron:
           <br />
@@ -34,7 +32,6 @@ const ReportIntro = () => {
         </h1>
         <p
           className="text-lg md:text-xl leading-relaxed"
-          style={{ fontFamily: "Courier, Courier New, monospace" }}
         >
           Инновационная система глубокого обучения для автоматического выявления эпилептических припадков и анализа биоэлектрической активности мозга.
         </p>
@@ -42,7 +39,6 @@ const ReportIntro = () => {
 
       <div
         className="relative z-20 bg-black text-white py-12 px-8 md:px-20 mt-[-80px]"
-        style={{ fontFamily: "Courier, Courier New, monospace" }}
       >
         <h2 className="text-3xl font-bold mb-6">Обзор проекта</h2>
         <p className="text-lg leading-relaxed mb-8">
