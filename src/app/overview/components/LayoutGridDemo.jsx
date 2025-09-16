@@ -5,7 +5,7 @@ import heh from "../../../../public/introductory/asdasd.jpg"
 
 const LayoutGridDemo = () => {
   return (
-    <div className="h-screen py-20 w-full" id="second">
+    <div className="h-screen py-20 bg-black w-full" id="second">
       <LayoutGrid cards={cards} />
     </div>
   );

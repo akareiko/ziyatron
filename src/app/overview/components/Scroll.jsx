@@ -7,31 +7,33 @@ import KekTwo from "../components/KekTwo";
 
 const Scroll = () => {
   return (
-    <div className="relative" id="start">
-      <div className="-z-5 absolute">
+    <div className="relative bg-black" id="start">
+      <div className="absolute">
         <KekTwo />
       </div>
-      <ContainerScroll
-        titleComponent={
-          <>
-            <h1 className="text-4xl  text-white font-sans">
-              AI powered medical assistance tool<br />
-              <span className="text-4xl md:text-[6rem]  mt-1 leading-none font-sans">
-                Ziyatron
-              </span>
-            </h1>
-          </>
-        }
-      >
-        <Image
-          src={tissue}
-          alt="hero"
-          height={720}
-          width={1400}
-          className="mx-auto rounded-2xl object-cover h-full object-left-top"
-          draggable={false}
-        />
-      </ContainerScroll>
+      <div className="z-10">
+        <ContainerScroll
+          titleComponent={
+            <>
+              <h1 className="text-4xl  text-white font-sans">
+                AI powered medical assistance tool<br />
+                <span className="text-4xl md:text-[6rem]  mt-1 leading-none font-sans">
+                  Ziyatron
+                </span>
+              </h1>
+            </>
+          }
+        >
+          <Image
+            src={tissue}
+            alt="hero"
+            height={720}
+            width={1400}
+            className="mx-auto rounded-2xl object-cover h-full object-left-top"
+            draggable={false}
+          />
+        </ContainerScroll>
+      </div>
     </div>
   );
 }
