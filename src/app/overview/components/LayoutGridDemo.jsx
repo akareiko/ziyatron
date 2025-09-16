@@ -17,11 +17,12 @@ const SkeletonOne = () => {
   return (
     <div>
       <p className="font-bold md:text-4xl text-xl text-white font-sans">
-        Diagnostic Accuracy and Biomarkers
+        Точность диагностики
       </p>
       <p className="font-normal text-base text-white"></p>
       <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-        MRI has been shown to be effective in detecting PD-related brain changes, such as iron accumulation in the substantia nigra or changes in brain volume
+        Ziyatron демонстрирует точность до 99.55%, чувствительность 98.68% и специфичность 99.81%. 
+        Эти показатели подтверждают её надёжность в выявлении эпилептических припадков по ЭЭГ-сигналам.
       </p>
     </div>
   );
@@ -31,15 +32,12 @@ const SkeletonTwo = () => {
   return (
     <div>
       <p className="font-bold md:text-4xl text-xl text-white font-sans">
-      Dataset
+        Данные и предобработка
       </p>
       <p className="font-normal text-base text-white"></p>
       <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-      The dataset for our Parkinson’s Disease Prediction Model project is sourced
-
-from the Parkinson’s Progression Markers Initiative (PPMI), a comprehen-
-sive observational study focused on identifying biomarkers for the progres-
-sion of Parkinson’s Disease
+        Система обрабатывает многоканальные ЭЭГ-записи с частотой 256 Гц, удаляет шумы и артефакты, 
+        нормализует данные и выделяет информативные участки. Это обеспечивает высокое качество анализа в реальном времени.
       </p>
     </div>
   );
@@ -48,12 +46,12 @@ const SkeletonThree = () => {
   return (
     <div>
       <p className="font-bold md:text-4xl text-xl text-white font-sans">
-      Parkinson’s disease
+        Эпилепсия и мониторинг
       </p>
       <p className="font-normal text-base text-white"></p>
       <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-         is the second most common neurodegenerative dis-
-        order and the most common movement-related brain disease
+        Ziyatron предназначен для помощи врачам и пациентам: он способен автоматически выявлять припадки, 
+        вести мониторинг и интегрироваться в телемедицинские платформы для удалённого наблюдения.
       </p>
     </div>
   );
@@ -62,14 +60,13 @@ const SkeletonFour = () => {
   return (
     <div>
       <p className="font-bold md:text-4xl text-xl text-white font-sans">
-        Neural Network
+        Архитектура и ИИ
       </p>
       <p className="font-normal text-base text-white"></p>
       <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-      By harnessing the power of AI to analyze MRI im-
-ages, there’s potential to revolutionize the diagnostic process, enabling more
-
-accurate and timely identification of Parkinson’s disease
+        В основе Ziyatron — мультимасштабные сверточные сети и трансформеры. 
+        Такая архитектура позволяет улавливать как локальные особенности, так и глобальные зависимости в ЭЭГ-сигналах, 
+        обеспечивая точность и интерпретируемость.
       </p>
     </div>
   );

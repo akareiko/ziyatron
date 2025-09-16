@@ -28,15 +28,15 @@ const ReportIntro = () => {
           className="text-4xl md:text-[4rem] font-bold mb-4 leading-none"
           style={{ fontFamily: "Courier, Courier New, monospace" }}
         >
-          AI-Powered Parkinson's
+          Ziyatron:
           <br />
-          <span className="text-4xl md:text-[3rem]">Diagnosis</span>
+          <span className="text-4xl md:text-[3rem]">AI для анализа ЭЭГ</span>
         </h1>
         <p
           className="text-lg md:text-xl leading-relaxed"
           style={{ fontFamily: "Courier, Courier New, monospace" }}
         >
-          Revolutionizing Early Detection through Medical Image Analysis
+          Инновационная система глубокого обучения для автоматического выявления эпилептических припадков и анализа биоэлектрической активности мозга.
         </p>
       </div>
 
@@ -44,45 +44,54 @@ const ReportIntro = () => {
         className="relative z-20 bg-black text-white py-12 px-8 md:px-20 mt-[-80px]"
         style={{ fontFamily: "Courier, Courier New, monospace" }}
       >
-        <h2 className="text-3xl font-bold mb-6">Project Overview</h2>
+        <h2 className="text-3xl font-bold mb-6">Обзор проекта</h2>
         <p className="text-lg leading-relaxed mb-8">
-          The main objective of this project is to develop an AI-based diagnostic tool capable of identifying early signs of Parkinson’s disease from SPECT imaging. By leveraging machine learning techniques, we aim to revolutionize early diagnosis and improve treatment outcomes.
+          Ziyatron разработан для автоматизированного анализа электроэнцефалограмм (ЭЭГ) и раннего выявления эпилептических припадков. 
+          Используя новейшие архитектуры глубокого обучения, он помогает врачам быстрее и точнее ставить диагнозы, снижая нагрузку на специалистов 
+          и улучшая качество медицинской помощи.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="flex flex-col items-start">
-            <h3 className="text-2xl font-bold mb-4">Data Collection</h3>
+            <h3 className="text-2xl font-bold mb-4">Сбор данных</h3>
             <p>
-              We sourced imaging data from the Parkinson's Progression Markers Initiative (PPMI), ensuring high-quality input data for model training and validation.
+              Система обрабатывает многоканальные ЭЭГ-сигналы, зарегистрированные с частотой 256 Гц. 
+              Данные проходят сегментацию на временные окна и подготовку к дальнейшему анализу, обеспечивая высокую точность работы модели.
             </p>
           </div>
 
           <div className="flex flex-col items-start">
-            <h3 className="text-2xl font-bold mb-4">Model Development</h3>
+            <h3 className="text-2xl font-bold mb-4">Разработка модели</h3>
             <p>
-              A 3D ResNet-based architecture was implemented, optimized for image classification, enabling accurate detection of Parkinson’s disease.
+              В основе Ziyatron — мультимасштабные сверточные сети в связке с трансформером. 
+              Такой подход позволяет улавливать и локальные особенности, и глобальные зависимости сигналов мозга, 
+              что обеспечивает практически идеальную точность диагностики.
             </p>
           </div>
 
           <div className="flex flex-col items-start">
-            <h3 className="text-2xl font-bold mb-4">Interpretability</h3>
+            <h3 className="text-2xl font-bold mb-4">Интерпретируемость</h3>
             <p>
-              Saliency maps were integrated to visualize areas of high importance within the images, enhancing the interpretability of model predictions.
+              Система использует карты внимания для выделения ключевых фрагментов ЭЭГ, 
+              что делает её прозрачным инструментом: врач может увидеть, какие именно участки сигнала повлияли на решение модели.
             </p>
           </div>
 
           <div className="flex flex-col items-start">
-            <h3 className="text-2xl font-bold mb-4">Results</h3>
+            <h3 className="text-2xl font-bold mb-4">Результаты</h3>
             <p>
-              Our model achieved state-of-the-art performance, providing a foundation for future research and clinical implementation for early Parkinson's diagnosis.
+              Ziyatron демонстрирует точность до 99.55%, чувствительность 98.68% и специфичность 99.81%. 
+              Эти показатели подтверждают её потенциал как клинического инструмента для диагностики и телемедицины.
             </p>
           </div>
         </div>
 
         <div className="mt-12">
-          <h3 className="text-2xl font-bold mb-4">Conclusion</h3>
+          <h3 className="text-2xl font-bold mb-4">Заключение</h3>
           <p className="leading-relaxed">
-            This project demonstrates the potential of AI in medical diagnostics, particularly in the early detection of Parkinson's disease. The innovative approach using deep learning models provides insights into medical image analysis, contributing to better patient outcomes and more effective treatments.
+            Ziyatron показывает, как искусственный интеллект способен изменить медицинскую диагностику. 
+            Система делает анализ ЭЭГ быстрым, точным и доступным, открывая новые возможности для врачей, 
+            исследователей и пациентов по всему миру.
           </p>
         </div>
       </div>

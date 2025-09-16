@@ -2,6 +2,9 @@
 import React from "react";
 import Image from "next/image";
 import overview_modelarch from "../../../../public/introductory/overview_modelarch.png";
+import eeg_segmentation from "../../../../public/introductory/eeg_segmentation.png";
+import main_page from "../../../../public/introductory/main_page.png";
+import add_patient from "../../../../public/introductory/add_patient.png";
 
 const PresentationPage = () => {
   return (
@@ -9,15 +12,6 @@ const PresentationPage = () => {
       className="w-full min-h-screen bg-white text-black overflow-hidden"
       style={{ fontFamily: "Courier, Courier New, monospace" }}
     >
-      {/* Intro Section */}
-      <section id="intro" className="relative flex flex-col items-center justify-center h-screen text-center p-8 bg-black text-white">
-        <h1 className="text-4xl md:text-[4rem] font-bold leading-none">
-          Ziyatron: AI для анализа ЭЭГ
-        </h1>
-        <p className="mt-4 text-xl">
-          Инновационная система глубокого обучения для автоматического выявления эпилептических припадков и анализа биоэлектрической активности мозга.
-        </p>
-      </section>
 
       {/* Web Development Section */}
       <section id="webdev" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8">
@@ -30,12 +24,29 @@ const PresentationPage = () => {
           </p>
         </div>
         <div className="md:w-1/2">
-          {/* <Image
-            src={spectImage}
-            alt="Web Development"
-            className="rounded-xl object-cover"
-            draggable={false}
-          /> */}
+          <video
+              src="/introductory/file_upload.mp4"
+              className="w-full h-auto rounded-xl object-cover mb-6"
+              draggable={false}
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          <div className="grid grid-cols-2 gap-4">
+            <Image
+              src={main_page}
+              alt="Main Page"
+              className="rounded-xl object-cover"
+              draggable={false}
+            />
+            <Image
+              src={add_patient}
+              alt="Add Patient"
+              className="rounded-xl object-cover"
+              draggable={false}
+            />
+          </div>
         </div>
       </section>
 
@@ -50,12 +61,12 @@ const PresentationPage = () => {
           </p>
         </div>
         <div className="md:w-1/2 order-1 md:order-2">
-          {/* <Image
-            src={control}
+          <Image
+            src={eeg_segmentation}
             alt="Data Preprocessing"
             className="rounded-xl object-cover"
             draggable={false}
-          /> */}
+          />
         </div>
       </section>
 
@@ -90,36 +101,17 @@ const PresentationPage = () => {
               Это повышает доверие к системе и делает её прозрачным инструментом для клинической практики.
             </p>
         </div>
-        <div className="md:w-1/2 order-1 md:order-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:w-1/2 order-1 md:order-2">
             <div className="flex justify-center">
-            {/* <Image
-                src={original}
-                alt="Original Image"
-                width={1162}
-                height={960}
-                className="rounded-xl object-cover"
-                draggable={false}
-            /> */}
-            </div>
-            <div className="flex justify-center">
-            {/* <Image
-                src={third}
-                alt="Saliency Map"
-                width={1162}
-                height={960}
-                className="rounded-xl object-cover"
-                draggable={false}
-            /> */}
-            </div>
-            <div className="flex justify-center">
-            {/* <Image
-                src={second}
-                alt="Overlay"
-                width={1162}
-                height={960}
-                className="rounded-xl object-cover"
-                draggable={false}
-            /> */}
+            <video
+              src="/introductory/gpt_response.mp4"
+              className="w-full h-auto rounded-xl object-cover"
+              draggable={false}
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
             </div>
         </div>
         </section>
