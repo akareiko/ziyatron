@@ -84,15 +84,13 @@ const cards = [
     id: 2,
     content: <SkeletonTwo />,
     className: "col-span-1",
-    thumbnail:
-      "https://i.pinimg.com/1200x/02/51/33/025133c4bef11872b9c8b45ed75f6e5c.jpg",
+    thumbnail: "introductory/eeg_waves.jpg"
   },
   {
     id: 3,
     content: <SkeletonThree />,
     className: "col-span-1",
-    thumbnail:
-      "https://static.independent.co.uk/s3fs-public/thumbnails/image/2011/01/01/16/526913_1.jpg",
+    thumbnail: "/introductory/eeg_monitoring.jpg",
   },
   {
     id: 4,
