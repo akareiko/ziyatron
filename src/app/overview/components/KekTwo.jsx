@@ -2,7 +2,7 @@ import Spline from '@splinetool/react-spline';
 
 const KekTwo = () => {
   return (
-    <Spline scene="https://prod.spline.design/e5ezzlIX18njCFxp/scene.splinecode"/>
+    <Spline scene="https://prod.spline.design/Yk73iwYJePnQyULb/scene.splinecode" />
   );
 };
 

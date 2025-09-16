@@ -15,9 +15,9 @@ const Scroll = () => {
         titleComponent={
           <>
             <h1 className="text-4xl  text-white font-sans">
-              graduation project for team<br />
+              AI powered medical assistance tool<br />
               <span className="text-4xl md:text-[6rem]  mt-1 leading-none font-sans">
-                Coup de Grâce
+                Ziyatron
               </span>
             </h1>
           </>
