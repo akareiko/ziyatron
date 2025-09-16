@@ -5,7 +5,7 @@ import LandingPage from "../components/LandingPage";
 
 // ---------------------
 // Main Page Component
-export default function Page({ children }) {
+export default function Page() {
   const { user, loading } = useAuth();
 
   if (loading)
@@ -15,7 +15,7 @@ export default function Page({ children }) {
       </div>
     );
 
-  if (user) return <LayoutWrapper>{children}</LayoutWrapper>;
+  if (user) return <LayoutWrapper />;
 
   return (
     <LandingPage />
