@@ -9,12 +9,11 @@ import add_patient from "../../../../public/introductory/add_patient.png";
 const PresentationPage = () => {
   return (
     <div
-      className="w-full min-h-screen bg-white text-black overflow-hidden"
-      style={{ fontFamily: "Courier, Courier New, monospace" }}
+      className="w-full min-h-screen text-black overflow-hidden"
     >
 
       {/* Web Development Section */}
-      <section id="webdev" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8">
+      <section id="webdev" className="relative flex text-white flex-col md:flex-row bg-black items-center justify-center h-screen p-8">
         <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Интерфейс и доступность</h2>
           <p className="text-lg">
@@ -33,20 +32,36 @@ const PresentationPage = () => {
               loop
               playsInline
             />
-          <div className="grid grid-cols-2 gap-4">
-            <Image
+        </div>
+      </section>
+
+      {/* Data Collection Section */}
+      <section
+        id="datacollection"
+        className="relative flex flex-col md:flex-row overflow-hidden items-center justify-center h-screen p-8 bg-[#111111] border-y border-white/20 text-white"
+      >
+        <div className="md:w-1/2 p-6">
+          <h2 className="text-3xl font-bold mb-4">Сбор данных</h2>
+          <p className="text-lg">
+            Ziyatron интегрируется с современными системами регистрации ЭЭГ, 
+            позволяя загружать данные из разных источников — от клинических приборов 
+            до исследовательских установок. Это обеспечивает гибкость и совместимость 
+            с существующей медицинской инфраструктурой.
+          </p>
+        </div>
+        <div className="md:w-1/2 flex flex-row">
+        {/* <Image
               src={main_page}
               alt="Main Page"
               className="rounded-xl object-cover"
               draggable={false}
-            />
-            <Image
-              src={add_patient}
-              alt="Add Patient"
-              className="rounded-xl object-cover"
-              draggable={false}
-            />
-          </div>
+            /> */}
+          <Image
+            src={add_patient}
+            alt="Data Collection"
+            className="rounded-xl object-cover"
+            draggable={false}
+          />
         </div>
       </section>
 
@@ -71,7 +86,7 @@ const PresentationPage = () => {
       </section>
 
       {/* Model Building Section */}
-      <section id="modelbuild" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8">
+      <section id="modelbuild" className="relative flex flex-col md:flex-row items-center justify-center bg-[#111111] border-y border-white/20 text-white h-screen p-8">
         <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Модель Ziyatron</h2>
           <p className="text-lg">
@@ -101,7 +116,7 @@ const PresentationPage = () => {
               Это повышает доверие к системе и делает её прозрачным инструментом для клинической практики.
             </p>
         </div>
-        <div className="md:w-1/2 order-1 md:order-2">
+        <div className="md:w-1/2 order-1 md:order-2 to-blue-100">
             <div className="flex justify-center">
             <video
               src="/introductory/gpt_response.mp4"

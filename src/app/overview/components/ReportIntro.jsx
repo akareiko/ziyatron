@@ -1,28 +1,27 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import coverImage from "../../../../public/introductory/tissue.jpg";
+import coverImage from "../../../../public/introductory/hihihi.jpeg";
 
 const ReportIntro = () => {
   return (
     <div
-      className="relative w-full min-h-screen bg-white overflow-hidden" id="end"
+      className="relative w-full min-h-screen overflow-hidden" id="end"
     >
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      {/* <div className="absolute inset-0 z-0">
         <Image
           src={coverImage}
           alt="Background"
           layout="fill"
           objectFit="cover"
           objectPosition="center"
-          className="opacity-10 grayscale"
           draggable={false}
         />
-      </div>
+      </div> */}
 
       {/* Project Title Section */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-screen text-center text-black px-6">
+      <div className="relative z-10 flex flex-col items-center h-screen justify-center bg-[#111111] text-center border-y border-white/20 text-white px-6">
         <h1
           className="text-4xl md:text-[4rem] font-bold mb-4 leading-none"
         >
@@ -38,7 +37,7 @@ const ReportIntro = () => {
       </div>
 
       <div
-        className="relative z-20 bg-black text-white py-12 px-8 md:px-20 mt-[-80px]"
+        className="relative z-20 bg-black text-white py-12 px-8 md:px-20"
       >
         <h2 className="text-3xl font-bold mb-6">Обзор проекта</h2>
         <p className="text-lg leading-relaxed mb-8">
