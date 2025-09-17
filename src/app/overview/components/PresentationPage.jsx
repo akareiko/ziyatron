@@ -5,6 +5,10 @@ import overview_modelarch from "../../../../public/introductory/overview_modelar
 import eeg_segmentation from "../../../../public/introductory/eeg_segmentation.png";
 import main_page from "../../../../public/introductory/main_page.png";
 import add_patient from "../../../../public/introductory/add_patient.png";
+import baground1 from "../../../../public/introductory/baground1.jpg"
+import baground2 from "../../../../public/introductory/baground2.jpg"
+import baground3 from "../../../../public/introductory/baground3.jpg"
+import baground4 from "../../../../public/introductory/baground4.jpg"
 
 const PresentationPage = () => {
   return (
@@ -22,10 +26,16 @@ const PresentationPage = () => {
             что делает систему доступной как в клиниках, так и в образовательных и исследовательских центрах.
           </p>
         </div>
-        <div className="md:w-1/2">
+        <div className="md:w-1/2 relative flex justify-center items-center">
+          <Image
+            src={baground1}
+            alt=""
+            className="w-[35vw] h-[35vw] absolute rounded-xl object-cover"
+            draggable={false}
+            />
           <video
               src="/introductory/file_upload.mp4"
-              className="w-full h-auto rounded-xl object-cover mb-6"
+              className="w-[30vw] h-[40vh] absolute z-10 rounded-2xl object-cover mb-6"
               draggable={false}
               autoPlay
               muted
@@ -40,6 +50,20 @@ const PresentationPage = () => {
         id="datacollection"
         className="relative flex flex-col md:flex-row overflow-hidden items-center justify-center h-screen p-8 m-5 rounded-xl bg-[#111111] border border-white/20 text-white"
       >
+        <div className="md:w-1/2 relative flex justify-center items-center">
+          <Image
+            src={baground2}
+            alt=""
+            className="absolute w-[35vw] h-[35vw] rounded-xl object-cover"
+            draggable={false}
+            />
+          <Image
+            src={add_patient}
+            alt="Data Collection"
+            className="w-[25vw] h-[25vw] absolute z-10 rounded-2xl object-fill"
+            draggable={false}
+          />
+        </div>
         <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Сбор данных</h2>
           <p className="text-lg">
@@ -49,25 +73,11 @@ const PresentationPage = () => {
             с существующей медицинской инфраструктурой.
           </p>
         </div>
-        <div className="md:w-1/2 flex flex-row">
-        {/* <Image
-              src={main_page}
-              alt="Main Page"
-              className="rounded-xl object-cover"
-              draggable={false}
-            /> */}
-          <Image
-            src={add_patient}
-            alt="Data Collection"
-            className="rounded-xl object-cover"
-            draggable={false}
-          />
-        </div>
       </section>
 
       {/* Data Preprocessing Section */}
       <section id="dataprep" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8 bg-black text-white">
-        <div className="md:w-1/2 p-6 order-2 md:order-1">
+        <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Предобработка данных</h2>
           <p className="text-lg">
             Система автоматически обрабатывает ЭЭГ-сигналы: удаляет артефакты, фильтрует шумы, нормализует данные и 
@@ -75,11 +85,17 @@ const PresentationPage = () => {
             и гарантирует устойчивость модели к реальным клиническим условиям.
           </p>
         </div>
-        <div className="md:w-1/2 order-1 md:order-2">
+        <div className="md:w-1/2 relative flex justify-center items-center">
+          <Image
+            src={baground4}
+            alt=""
+            className="absolute w-[35vw] h-[35vw] rounded-xl object-cover"
+            draggable={false}
+            />
           <Image
             src={eeg_segmentation}
             alt="Data Preprocessing"
-            className="rounded-xl object-cover"
+            className="w-[30vw] h-[10vw] absolute z-10 rounded-2xl object-fill"
             draggable={false}
           />
         </div>
@@ -87,6 +103,20 @@ const PresentationPage = () => {
 
       {/* Model Building Section */}
       <section id="modelbuild" className="relative flex flex-col md:flex-row items-center justify-center m-5 rounded-xl bg-[#111111] border border-white/20 text-white h-screen p-8">
+      <div className="md:w-1/2 relative flex justify-center items-center">
+          <Image
+            src={baground3}
+            alt=""
+            className="absolute w-[35vw] h-[35vw] rounded-xl object-cover"
+            draggable={false}
+            />
+          <Image
+            src={overview_modelarch}
+            alt="Model Architecture"
+            className="w-[30vw] h-[10vw] absolute z-10 rounded-2xl object-fill"
+            draggable={false}
+          />
+        </div>
         <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Модель Ziyatron</h2>
           <p className="text-lg">
@@ -95,20 +125,12 @@ const PresentationPage = () => {
             Благодаря этому модель достигает точности до 99.55% и способна работать в реальном времени.
           </p>
         </div>
-        <div className="md:w-1/2">
-          <Image
-            src={overview_modelarch}
-            alt="Model Architecture"
-            className="rounded-xl object-cover"
-            draggable={false}
-          />
-        </div>
       </section>
 
       {/* Visualization Section */}
 
-        <section id="visua" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8 bg-black text-white">
-        <div className="md:w-1/2 p-6 order-2 md:order-1">
+      <section id="visua" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8 bg-black text-white">
+        <div className="md:w-1/2 p-6">
             <h2 className="text-3xl font-bold mb-4">Интерпретация и визуализация</h2>
             <p className="text-lg">
               Ziyatron не только классифицирует припадки, но и объясняет свои решения. 
@@ -116,22 +138,24 @@ const PresentationPage = () => {
               Это повышает доверие к системе и делает её прозрачным инструментом для клинической практики.
             </p>
         </div>
-        <div className="md:w-1/2 order-1 md:order-2 to-blue-100">
-            <div className="flex justify-center">
-            <video
+        <div className="md:w-1/2 relative flex justify-center items-center">
+          <Image
+            src={baground1}
+            alt=""
+            className="w-[35vw] h-[35vw] absolute rounded-xl object-cover"
+            draggable={false}
+            />
+          <video
               src="/introductory/gpt_response.mp4"
-              className="w-full h-auto rounded-xl object-cover"
+              className="w-[30vw] h-[40vh] absolute z-10 rounded-2xl object-cover mb-6"
               draggable={false}
               autoPlay
               muted
               loop
               playsInline
             />
-            </div>
         </div>
-        </section>
-
-
+      </section>
     </div>
   );
 };
