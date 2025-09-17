@@ -4,7 +4,7 @@ import { LayoutGrid } from "./LayoutGrid";
 
 const LayoutGridDemo = () => {
   return (
-    <div className="h-screen bg-[#111111] border-y border-white/20 w-full" id="second">
+    <div className="h-screen w-full" id="second">
       <LayoutGrid cards={cards} />
     </div>
   );
@@ -67,6 +67,27 @@ const SkeletonFour = () => (
   </div>
 );
 
+const SkeletonOneHeader = () => (
+  <p className="md:text-4xl text-xl text-white font-sans">
+    Точность диагностики
+  </p>
+)
+const SkeletonTwoHeader = () => (
+  <p className="md:text-4xl text-xl text-white font-sans">
+    Данные и предобработка
+  </p>
+)
+const SkeletonThreeHeader = () => (
+  <p className="md:text-4xl text-xl text-white font-sans">
+    Эпилепсия и мониторинг
+  </p>
+)
+const SkeletonFourHeader = () => (
+  <p className="md:text-4xl text-xl text-white font-sans">
+    Архитектура и ИИ
+  </p>
+)
+
 /* -------------------------------
    Card data
 -------------------------------- */
@@ -74,6 +95,7 @@ const cards = [
   {
     id: 1,
     content: <SkeletonOne />,
+    header: <SkeletonOneHeader />,
     className: "md:col-span-2",
     thumbnail:
       "https://assets.kimshospitals.com/images/blogs/75_1573199315.jpg",
@@ -81,18 +103,21 @@ const cards = [
   {
     id: 2,
     content: <SkeletonTwo />,
+    header: <SkeletonTwoHeader />, 
     className: "col-span-1",
     thumbnail: "/introductory/eeg_waves.jpg", // ✅ use /public folder path
   },
   {
     id: 3,
     content: <SkeletonThree />,
+    header: <SkeletonThreeHeader />,
     className: "col-span-1",
     thumbnail: "/introductory/eeg_monitoring.jpg",
   },
   {
     id: 4,
     content: <SkeletonFour />,
+    header: <SkeletonFourHeader />,
     className: "md:col-span-2",
     thumbnail:
       "https://static.scientificamerican.com/sciam/cache/file/E6AEDA9A-A91E-45C2-977EAA3C3185D55E_source.jpg",

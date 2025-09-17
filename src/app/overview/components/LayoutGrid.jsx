@@ -95,7 +95,7 @@ export const LayoutGrid = ({ cards = [] }) => {
                 }}
                 className={cn(
                   card.className,
-                  "relative overflow-hidden cursor-pointer",
+                  "relative overflow-hidden cursor-pointer group", // <-- added group
                   selected?.id === card.id
                     ? "rounded-lg fixed inset-0 h-1/2 w-full md:w-1/2 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
                     : lastSelected?.id === card.id
@@ -105,19 +105,21 @@ export const LayoutGrid = ({ cards = [] }) => {
                 layoutId={`card-${card.id}`}
                 whileHover={selected?.id !== card.id ? { scale: 1.02 } : {}}
                 transition={{ duration: 0.2 }}
-                role="button"
-                tabIndex={0}
-                aria-label={`View details for ${card.title || 'card'}`}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleClick(card);
-                  }
-                }}
               >
-                {selected?.id === card.id && <SelectedCard selected={selected} closeSelected={closeSelected}/>}
                 <ImageComponent card={card} />
+
+                {/* 🔹 Overlay with text (only when not selected) */}
+                {!selected && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-4 opacity-100 group-hover:bg-black/60 transition">
+                    <div className="text-white text-center">
+                      {card.header}
+                    </div>
+                  </div>
+                )}
+
+                {selected?.id === card.id && (
+                  <SelectedCard selected={selected} closeSelected={closeSelected} />
+                )}
               </motion.div>
             </div>
           );
