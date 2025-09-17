@@ -38,7 +38,7 @@ const PresentationPage = () => {
       {/* Data Collection Section */}
       <section
         id="datacollection"
-        className="relative flex flex-col md:flex-row overflow-hidden items-center justify-center h-screen p-8 bg-[#111111] border-y border-white/20 text-white"
+        className="relative flex flex-col md:flex-row overflow-hidden items-center justify-center h-screen p-8 m-5 rounded-xl bg-[#111111] border border-white/20 text-white"
       >
         <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Сбор данных</h2>
@@ -86,7 +86,7 @@ const PresentationPage = () => {
       </section>
 
       {/* Model Building Section */}
-      <section id="modelbuild" className="relative flex flex-col md:flex-row items-center justify-center bg-[#111111] border-y border-white/20 text-white h-screen p-8">
+      <section id="modelbuild" className="relative flex flex-col md:flex-row items-center justify-center m-5 rounded-xl bg-[#111111] border border-white/20 text-white h-screen p-8">
         <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Модель Ziyatron</h2>
           <p className="text-lg">

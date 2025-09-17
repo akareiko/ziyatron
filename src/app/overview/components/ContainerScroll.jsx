@@ -92,7 +92,7 @@ export const ContainerScroll = React.memo(({
         </motion.div>
         
         {/* Additional spacing for scroll continuation */}
-        <div className="h-screen" />
+        <div className="h-[50vh]" />
       </div>
     </div>
   );

@@ -99,8 +99,8 @@ export const LayoutGrid = ({ cards = [] }) => {
                   selected?.id === card.id
                     ? "rounded-lg fixed inset-0 h-1/2 w-full md:w-1/2 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
                     : lastSelected?.id === card.id
-                    ? "z-40 bg-white rounded-xl h-full w-full"
-                    : "bg-white rounded-xl h-full w-full hover:shadow-lg transition-shadow duration-200"
+                    ? "z-40 bg-black rounded-xl h-full w-full"
+                    : "bg-black rounded-xl h-full w-full hover:shadow-lg transition-shadow duration-200"
                 )}
                 layoutId={`card-${card.id}`}
                 whileHover={selected?.id !== card.id ? { scale: 1.02 } : {}}
@@ -210,7 +210,7 @@ const SelectedCard = React.memo(({ selected, closeSelected }) => {
         animate={{ opacity: 0.6 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="absolute inset-0 h-full w-full bg-black opacity-60 z-10"
+        className="absolute inset-0 h-full w-full bg-black z-10"
       />
       <motion.div
         layoutId={`content-${selected.id}`}
