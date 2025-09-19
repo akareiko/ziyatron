@@ -18,7 +18,7 @@ function SidebarHeader({ collapsed, setCollapsed, scrollContainerRef }) {
         // Collapsed: only arrow button
         <button
           onClick={() => setCollapsed(false)}
-          className="flex items-center p-2 rounded-lg text-black hover:bg-black/5 transition-colors duration-200"
+          className="flex items-center p-2 rounded-xl text-black hover:bg-black/5 transition-colors duration-200"
           aria-label="Expand sidebar"
         >
           <svg

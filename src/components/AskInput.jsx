@@ -1,9 +1,46 @@
 'use client';
-import { useState, useRef, useLayoutEffect, useEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect, memo } from "react";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "../lib/firebase";
 import { useFloating, offset, flip, shift, FloatingPortal } from "@floating-ui/react";
 import { useChat } from "../context/ChatContext";
+
+// -------------------------
+// Tooltip button (moved outside and memoized)
+// -------------------------
+const TooltipButton = memo(function TooltipButton({ tooltip, children, className = "", ...props }) {
+  const [open, setOpen] = useState(false);
+  const { refs, floatingStyles } = useFloating({
+    placement: "bottom",
+    middleware: [offset(8), flip(), shift()],
+  });
+
+  return (
+    <>
+      <button
+        ref={refs.setReference}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        className={className}
+        {...props}
+      >
+        {children}
+      </button>
+
+      {open && (
+        <FloatingPortal>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className="px-2 py-1 rounded text-xs text-white bg-black/80 shadow whitespace-nowrap z-[9999]"
+          >
+            {tooltip}
+          </div>
+        </FloatingPortal>
+      )}
+    </>
+  );
+});
 
 export default function AskInput({ onSend, externalFile = null, onExternalFileHandled = () => {} }) {
   const [inputValue, setInputValue] = useState("");
@@ -17,43 +54,6 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
   const [isUploading, setIsUploading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const { isStreaming, setIsStreaming } = useChat();
-
-  // -------------------------
-  // Tooltip button
-  // -------------------------
-  function TooltipButton({ tooltip, children, className = "", ...props }) {
-    const [open, setOpen] = useState(false);
-    const { refs, floatingStyles } = useFloating({
-      placement: "bottom",
-      middleware: [offset(8), flip(), shift()],
-    });
-
-    return (
-      <>
-        <button
-          ref={refs.setReference}
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
-          className={className}
-          {...props}
-        >
-          {children}
-        </button>
-
-        {open && (
-          <FloatingPortal>
-            <div
-              ref={refs.setFloating}
-              style={floatingStyles}
-              className="px-2 py-1 rounded text-xs text-white bg-black/80 shadow whitespace-nowrap z-[9999]"
-            >
-              {tooltip}
-            </div>
-          </FloatingPortal>
-        )}
-      </>
-    );
-  }
 
   // -------------------------
   // File handling
@@ -190,11 +190,11 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
     if (!externalFile) return;
     uploadFile(externalFile);
     onExternalFileHandled?.();
-  }, [externalFile]);
+  }, [externalFile, onExternalFileHandled]);
 
   return (
     <div
-      className="w-full max-w-3xl bg-white backdrop-blur-lg border border-black/20 overflow-hidden"
+      className="w-full max-w-3xl bg-white/80 backdrop-blur-xs border shadow-lg border-white/90 overflow-hidden"
       style={{
         borderRadius: isBar ? "9999px" : "1.5rem",
         padding: isBar ? "0.5rem 0.75rem" : "0.75rem",
@@ -233,7 +233,7 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
 
       <div className={`flex  gap-2 ${isBar ? "items-center" : " flex-col"}`}>
         {isBar && (
-          <TooltipButton tooltip="Upload" onClick={handleUploadClick} className="p-2 rounded-full hover:bg-black/10 transition">
+          <TooltipButton tooltip="Upload" onClick={handleUploadClick} className="p-2 rounded-full hover:bg-gray-200/80 transition">
             <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M12 4v16M4 12h16" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -254,7 +254,7 @@ export default function AskInput({ onSend, externalFile = null, onExternalFileHa
             tooltip={isSending ? "Processing..." : "Send"}
             onClick={handleSend}
             disabled={isUploading || isSending || isStreaming}
-            className={`p-2 rounded-full transition ${isUploading || isSending || isStreaming ? "opacity-50 cursor-not-allowed" : "hover:bg-black/10"}`}
+            className={`p-2 rounded-full transition ${isUploading || isSending || isStreaming ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200/80"}`}
           >
             {isStreaming ? (
               <svg width="20" height="20" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24">

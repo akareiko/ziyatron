@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import BlurEffect from "react-progressive-blur";
 
 // SVG Logo Component
 const Logo = () => (
@@ -134,17 +135,15 @@ export default function Navbar() {
     <>
       {/* Fixed navbar */}
       <header className="fixed top-0 left-0 right-0 z-[9999] w-full">
-        {/* Backdrop blur layer */}
-        <div 
-          className="absolute inset-0 backdrop-blur-xs bg-black/20"
-          style={{
-            maskImage: 'linear-gradient(to bottom, black 0%, black 40%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 40%, transparent 100%)'
+        {/* Top gradient + blur */}
+        <div className="absolute top-0 left-0 w-full h-20 pointer-events-none z-10" 
+          style={{ 
+            background: "linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.5), rgba(255,255,255,0))"
           }}
         />
-        
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/100 via-black/40 to-transparent" />
+        <div className="relative">
+          <BlurEffect position="top" intensity={50} className="h-20" />
+        </div>
         
         {/* Content container */}
         <div className="relative z-10 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">

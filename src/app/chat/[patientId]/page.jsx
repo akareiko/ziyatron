@@ -6,7 +6,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 
-
 function TypingIndicator() {
   return (
     <div className="flex space-x-1 items-center">
@@ -58,8 +57,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
-    // If last message is from user and assistant is streaming -> show typing
-    if (lastMessage?.role === "user" && !isStreaming) {
+    if (lastMessage?.role === "user" && (isStreaming || !messages.some(m => m.role === "assistant"))) {
       setIsGenerating(true);
     } else {
       setIsGenerating(false);
@@ -70,8 +68,7 @@ export default function ChatPage() {
     <div className="text-black font-sans">
       {error && <p className="text-red-400">Error: {error}</p>}
 
-      <div className="space-y-6 max-w-3xl pt-4">
-
+      <div className="space-y-6 max-w-3xl pt-18 pb-18">
         {isLoading ? (
           <div>
 

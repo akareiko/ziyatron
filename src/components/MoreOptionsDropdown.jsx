@@ -31,14 +31,14 @@ export default function MoreOptionsDropdown({ patient = null }) {
       <button
         ref={refs.setReference}
         onClick={() => setOpenMenu((o) => !o)}
-        className="p-2 rounded-xl hover:bg-black/10 transition"
+        className="p-2 rounded-3xl hover:bg-gray-200/80 bg-white/80 border border-white/90 shadow-lg transition"
         aria-label="More options"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          height="18px"
+          height="20px"
           viewBox="0 -960 960 960"
-          width="18px"
+          width="20px"
           fill="#000000ff"
         >
           <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 

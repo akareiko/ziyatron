@@ -74,7 +74,8 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, pa
     <>
       <aside
         role="navigation"
-        className="top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white backdrop-blur-2xl border border-gray-300"
+        className="top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-xl bg-white/70 backdrop-blur-2xl border border-white/80"
+        // className="top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white/10 backdrop-blur-2xl border border-gray-300"
         aria-label="Sidebar"
       >
         <div className="h-full text-sm flex flex-col overflow-hidden">

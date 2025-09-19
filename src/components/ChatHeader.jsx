@@ -18,18 +18,17 @@ export default function ChatHeader({ patientName, rightExpanded, setRightExpande
   };
 
   return (
-    <div className="flex items-center justify-between pb-2 mb-0 border-b border-gray-300">
+    <div className="flex items-center justify-between pb-2">
       <span className="flex flex-row items-center">
-        <button className="p-2 rounded-xl hover:bg-black/10 transition flex flex-row"
+        <button className="py-2 px-4 rounded-3xl hover:bg-gray-200/80 bg-white/80 shadow-lg border border-white/90 transition flex flex-row"
               aria-label="Share patient link">
-          {/* <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000ff"><path d="M480-492q-76 0-129-53t-53-129q0-76 53-129t129-53q76 0 129 53t53 129q0 76-53 129t-129 53ZM130-99v-143q0-41 19.69-73.85Q169.38-348.71 202-366q66-34 135.91-51t142-17Q552-434 622-417t136 51q32.63 17.29 52.31 50.15Q830-283 830-242v143H130Z"/></svg> */}
-          <h2 className="text-lg font-light text-black">{patientName}</h2>
+          <h2 className="font-light text-black">{patientName}</h2>
         </button>
       </span>
       {patientId && (
         <div className="flex items-center gap-3 text-sm">
           <button
-            className="p-2 rounded-xl hover:bg-black/10 transition flex flex-row"
+            className="py-2 px-4 rounded-3xl hover:bg-gray-200/80 bg-white/80 border border-white/90 shadow-lg transition flex flex-row"
             aria-label="Share patient link"
             onClick={handleShare}
           >
@@ -41,7 +40,7 @@ export default function ChatHeader({ patientName, rightExpanded, setRightExpande
           <MoreOptionsDropdown patient={patientId} />
           <button
             onClick={() => setRightExpanded(!rightExpanded)}
-            className="p-2 rounded-xl hover:bg-black/10 transition"
+            className="p-2 rounded-3xl hover:bg-gray-200/80 bg-white/80 border border-white/90 shadow-lg transition"
             aria-label={rightExpanded ? "Collapse patient info" : "Expand patient info"}
           >
             {rightExpanded ? (

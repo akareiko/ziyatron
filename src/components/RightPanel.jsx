@@ -1,4 +1,3 @@
-import NewPatientModal from "./NewPatientModal";
 import AskInput from "./AskInput";
 import { useChat } from "../context/ChatContext";
 import { useState, useEffect } from "react";
@@ -6,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { getPatients } from "../lib/api";
 import ChatHeader from "./ChatHeader";
 import Dashboard from "./Dashboard";
+import BlurEffect from "react-progressive-blur";
 
 // ----------------------------
 // Custom hook for fetching patients
@@ -72,19 +72,8 @@ export default function RightPanel({
 
   return (
     <div
-      className="relative rounded-3xl border border-gray-300 m-4 shadow-lg bg-white backdrop-blur-2xl flex flex-col h-full pt-2 pr-6 pl-6 pb-2"
-      style={{ height: "calc(100% - 2rem)" }}
+      className="relative rounded-3xl flex flex-col h-full"
     >
-      {/* Chat header */}
-      {patient && (
-        <ChatHeader
-          patientName={patient.name}
-          patientId={patientId}
-          rightExpanded={rightExpanded}
-          setRightExpanded={setRightExpanded}
-        />
-      )}
-
       {/* Main chat + right panel */}
       <div className="flex flex-1 overflow-hidden">
         {/* Chat area */}
@@ -94,7 +83,21 @@ export default function RightPanel({
             flex: rightExpanded ? "0 0 80%" : "0 0 100%",
           }}
         >
-          <div className={`flex flex-col justify-end h-full w-full relative ${!patientId ? "pb-0" : "pb-6"}`}>
+          <div className="flex flex-col justify-end h-full w-full relative">
+            {/* Chat header */}
+            {patient && (
+              <div className="absolute top-4 left-0 right-0 z-10 flex justify-center">
+                <div className="w-full max-w-3xl">
+                  <ChatHeader
+                  patientName={patient.name}
+                  patientId={patientId}
+                  rightExpanded={rightExpanded}
+                  setRightExpanded={setRightExpanded}
+                />
+                </div>
+              </div>
+            )}
+
             {/* Chat messages area */}
             <div className="flex-1 overflow-auto">
               {!patientId ? (
@@ -114,7 +117,7 @@ export default function RightPanel({
 
             {/* AskInputWrapper */}
             {patientId && (
-              <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-center">
+              <div className="absolute bottom-4 left-0 right-0 z-10 flex justify-center">
                 <div className="w-full max-w-3xl">
                   <AskInputWrapper
                     patientId={patientId}
@@ -129,7 +132,7 @@ export default function RightPanel({
 
         {/* Right panel details */}
         {rightExpanded && patient && (
-          <div className="transition-all duration-300 w-[20%] p-4 overflow-y-auto">
+          <div className="transition-all duration-300 w-[20%] p-4 overflow-y-auto z-30">
             <h2 className="text-xl font-bold">{patient.name}</h2>
             <p className="text-gray-600">
               {patient.condition || "No condition provided"}

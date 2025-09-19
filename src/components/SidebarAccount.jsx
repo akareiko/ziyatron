@@ -23,8 +23,8 @@ export default function SidebarAccount({ collapsed }) {
     window.location.href = "http://localhost:3000";
   };
 
-  const initial = (user.name || user.email || "U")[0].toUpperCase();
-  const colorHash = Array.from(user.email || "user").reduce(
+  const initial = ((user?.name || user?.email || "U")[0] || "U").toUpperCase();
+  const colorHash = Array.from(user?.email || "user").reduce(
     (acc, char) => acc + char.charCodeAt(0),
     0
   );
@@ -89,7 +89,7 @@ export default function SidebarAccount({ collapsed }) {
               collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
             )}
           >
-            {user.name || user.email}
+            {user?.name || user?.email}
           </span>
         </div>
 

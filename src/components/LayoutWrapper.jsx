@@ -9,6 +9,7 @@ import { getPatients } from "../lib/api";
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import NewPatientModal from "./NewPatientModal";
+import BlurEffect from "react-progressive-blur";
 
 // ----------------------------
 // LayoutWrapper
@@ -66,7 +67,8 @@ export default function LayoutWrapper({ children }) {
 
   return (
     
-    <div className="relative min-h-screen text-black bg-gray-100">
+    // <div className="relative min-h-screen text-black bg-gradient-to-r from-blue-100 via-gray-100 to-white">
+    <div className="relative min-h-screen text-black bg-gray-50">
       {/* <div className="relative min-h-screen text-black bg-gradient-to-br from-gray-200 via-gray-500/40 to-gray-300"> */}
       <NewPatientModal
             isOpen={showModal}
@@ -74,6 +76,24 @@ export default function LayoutWrapper({ children }) {
             onNewPatientAdded={handleNewPatientAdded}
             />
       <div className="relative z-10 flex h-screen">
+        {/* Top gradient + blur */}
+        <div className="absolute top-0 left-0 w-full h-30 pointer-events-none z-10" 
+          style={{ 
+            background: "linear-gradient(to bottom, rgba(249, 250, 251,1), rgba(249, 250, 251,0.5), rgba(249, 250, 251,0))"
+          }}
+        />
+        <div className="relative">
+          <BlurEffect position="top" intensity={50} className="h-20" />
+        </div>
+        {/* Bottom gradient + blur */}
+        <div className="absolute bottom-0 left-0 w-full h-30 pointer-events-none z-10" 
+          style={{ 
+            background: "linear-gradient(to top, rgba(249, 250, 251,1), rgba(249, 250, 251,0.5), rgba(249, 250, 251,0))"
+          }}
+        />
+        <div className="relative">
+          <BlurEffect position="bottom" intensity={50} className="h-20" />
+        </div>
 
         {/* Sidebar */}
         <div className={`transition-all duration-300 ${collapsed ? "w-[9%]" : "w-[20%]"} flex flex-col h-full`}>

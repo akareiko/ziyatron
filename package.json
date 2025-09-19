@@ -15,12 +15,12 @@
     "clsx": "^2.1.1",
     "firebase": "^12.2.1",
     "framer-motion": "^12.23.13",
-    "lucide-react": "^0.544.0",
-    "next": "15.4.5",
+    "next": "^15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hot-toast": "^2.6.0",
     "react-markdown": "^10.1.0",
+    "react-progressive-blur": "^1.0.5",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.1",
@@ -33,6 +33,7 @@
     "@types/react": "19.1.12",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "sass": "^1.92.1",
     "tailwindcss": "^4"
   }
 }
