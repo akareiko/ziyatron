@@ -1,7 +1,8 @@
 'use client';
 import { useAuth } from "../context/AuthContext";
 import LayoutWrapper from "../components/LayoutWrapper";
-import LandingPage from "../components/LandingPage";
+import LandingPage from "../components/LandingPage"; // TODO: Delete
+import OverviewPage from "./overview/page";
 
 // ---------------------
 // Main Page Component
@@ -18,6 +19,6 @@ export default function Page() {
   if (user) return <LayoutWrapper />;
 
   return (
-    <LandingPage />
+    <OverviewPage />
   );
 }

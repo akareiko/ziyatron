@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import BlurEffect from "react-progressive-blur";
+import { useAuth } from "../../../context/AuthContext";
+import { useRouter } from "next/navigation";
 
 // SVG Logo Component
 const Logo = () => (
@@ -95,14 +97,32 @@ const HoveredLink = ({ children, href, ...rest }) => {
 
 // Try Button Component - matching menu style
 const TryButton = () => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
+
+  const handleClick = () => {
+    if (user) {
+      router.push('/');
+    } else {
+      router.push('/login');
+    }
+  };
+
   return (
-    <Link 
-      href="/"
+    <button
+      onClick={handleClick}
       className="relative rounded-full border border-white/20 bg-white/5 backdrop-blur-md shadow-lg flex items-center space-x-2 p-4 text-neutral-300 hover:text-white transition-colors duration-200 font-medium hover:bg-white/5"
       aria-label="Try Ziyatron"
     >
       <span className="relative z-10">Try Ziyatron</span>
-    </Link>
+    </button>
   );
 };
 
