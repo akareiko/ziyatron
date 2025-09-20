@@ -19,11 +19,11 @@ const PresentationPage = () => {
       {/* Web Development Section */}
       <section id="webdev" className="relative flex text-white flex-col md:flex-row bg-black items-center justify-center h-screen p-8">
         <div className="md:w-1/2 p-6">
-          <h2 className="text-3xl font-bold mb-4">Интерфейс и доступность</h2>
+          <h2 className="text-3xl font-bold mb-4">Interface & Accessibility</h2>
           <p className="text-lg">
-            Ziyatron предлагает удобный веб-интерфейс для загрузки, анализа и визуализации ЭЭГ-записей. 
-            Врачи и исследователи могут удалённо получать результаты диагностики в режиме реального времени, 
-            что делает систему доступной как в клиниках, так и в образовательных и исследовательских центрах.
+            Ziyatron offers an intuitive web interface for uploading, analyzing, and visualizing EEG recordings. 
+            Doctors and researchers can access diagnostic results remotely in real time, making the system 
+            available not only in clinics but also in educational and research centers.
           </p>
         </div>
         <div className="md:w-1/2 relative flex justify-center items-center">
@@ -35,7 +35,7 @@ const PresentationPage = () => {
             />
           <video
               src="/introductory/file_upload.mp4"
-              className="w-[30vw] h-[40vh] absolute z-10 rounded-2xl object-cover mb-6"
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2/3 md:w-13/20 rounded-lg shadow-lg"
               draggable={false}
               autoPlay
               muted
@@ -51,26 +51,27 @@ const PresentationPage = () => {
         className="relative flex flex-col md:flex-row overflow-hidden items-center justify-center h-screen p-8 m-5 rounded-xl bg-[#111111] border border-white/20 text-white"
       >
         <div className="md:w-1/2 relative flex justify-center items-center">
+          {/* Background frame image */}
           <Image
             src={baground2}
             alt=""
-            className="absolute w-[35vw] h-[35vw] rounded-xl object-cover"
+            className="absolute w-[35vw] h-auto max-h-[80vh] rounded-xl object-contain"
             draggable={false}
-            />
+          />
+
+          {/* Centered overlay image */}
           <Image
             src={add_patient}
             alt="Data Collection"
-            className="w-[25vw] h-[25vw] absolute z-10 rounded-2xl object-fill"
+            className="absolute z-10 w-[25vw] h-auto rounded-2xl object-contain"
             draggable={false}
           />
         </div>
         <div className="md:w-1/2 p-6">
-          <h2 className="text-3xl font-bold mb-4">Сбор данных</h2>
+          <h2 className="text-3xl font-bold mb-4">Data Collection</h2>
           <p className="text-lg">
-            Ziyatron интегрируется с современными системами регистрации ЭЭГ, 
-            позволяя загружать данные из разных источников — от клинических приборов 
-            до исследовательских установок. Это обеспечивает гибкость и совместимость 
-            с существующей медицинской инфраструктурой.
+            Ziyatron integrates with modern EEG recording systems, allowing data to be uploaded from various sources—from clinical devices to research setups. 
+            This ensures flexibility and compatibility with existing medical infrastructure.
           </p>
         </div>
       </section>
@@ -78,24 +79,23 @@ const PresentationPage = () => {
       {/* Data Preprocessing Section */}
       <section id="dataprep" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8 bg-black text-white">
         <div className="md:w-1/2 p-6">
-          <h2 className="text-3xl font-bold mb-4">Предобработка данных</h2>
+          <h2 className="text-3xl font-bold mb-4">Data Preprocessing</h2>
           <p className="text-lg">
-            Система автоматически обрабатывает ЭЭГ-сигналы: удаляет артефакты, фильтрует шумы, нормализует данные и 
-            выделяет информативные участки. Такой многоэтапный подход обеспечивает высокое качество данных для анализа 
-            и гарантирует устойчивость модели к реальным клиническим условиям.
+            The system automatically processes EEG signals by removing artifacts, filtering noise, normalizing data, and extracting the most informative segments. 
+            This multi-step approach ensures high-quality data for analysis and guarantees the model’s robustness under real clinical conditions.
           </p>
         </div>
         <div className="md:w-1/2 relative flex justify-center items-center">
           <Image
             src={baground4}
             alt=""
-            className="absolute w-[35vw] h-[35vw] rounded-xl object-cover"
+            className="absolute w-[35vw] h-auto rounded-xl object-cover"
             draggable={false}
             />
           <Image
             src={eeg_segmentation}
             alt="Data Preprocessing"
-            className="w-[30vw] h-[10vw] absolute z-10 rounded-2xl object-fill"
+            className="w-[30vw] h-auto absolute z-10 rounded-2xl object-fill"
             draggable={false}
           />
         </div>
@@ -107,22 +107,22 @@ const PresentationPage = () => {
           <Image
             src={baground3}
             alt=""
-            className="absolute w-[35vw] h-[35vw] rounded-xl object-cover"
+            className="absolute w-[35vw] h-auto rounded-xl object-cover"
             draggable={false}
             />
           <Image
             src={overview_modelarch}
             alt="Model Architecture"
-            className="w-[30vw] h-[10vw] absolute z-10 rounded-2xl object-fill"
+            className="w-[30vw] h-auto absolute z-10 rounded-2xl object-fill"
             draggable={false}
           />
         </div>
         <div className="md:w-1/2 p-6">
-          <h2 className="text-3xl font-bold mb-4">Модель Ziyatron</h2>
+          <h2 className="text-3xl font-bold mb-4">The Ziyatron Model</h2>
           <p className="text-lg">
-            В основе Ziyatron лежит мультимасштабная архитектура глубокого обучения, сочетающая свёрточные сети и трансформеры. 
-            Она улавливает как локальные детали, так и глобальные связи в ЭЭГ-сигналах. 
-            Благодаря этому модель достигает точности до 99.55% и способна работать в реальном времени.
+            At the core of Ziyatron is a multi-scale deep learning architecture combining convolutional networks and transformers. 
+            It captures both local details and global dependencies in EEG signals. 
+            This enables the model to achieve up to 99.55% accuracy while operating in real time.
           </p>
         </div>
       </section>
@@ -131,12 +131,12 @@ const PresentationPage = () => {
 
       <section id="visua" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8 bg-black text-white">
         <div className="md:w-1/2 p-6">
-            <h2 className="text-3xl font-bold mb-4">Интерпретация и визуализация</h2>
-            <p className="text-lg">
-              Ziyatron не только классифицирует припадки, но и объясняет свои решения. 
-              С помощью карт внимания и визуальных подсказок врач может увидеть, какие участки сигнала стали ключевыми для диагностики. 
-              Это повышает доверие к системе и делает её прозрачным инструментом для клинической практики.
-            </p>
+          <h2 className="text-3xl font-bold mb-4">Interpretation & Visualization</h2>
+          <p className="text-lg">
+            Ziyatron not only classifies seizures but also explains its decisions. 
+            Using attention maps and visual cues, doctors can see which parts of the EEG signal were critical for the diagnosis. 
+            This enhances trust in the system and makes it a transparent tool for clinical practice.
+          </p>
         </div>
         <div className="md:w-1/2 relative flex justify-center items-center">
           <Image
@@ -147,7 +147,7 @@ const PresentationPage = () => {
             />
           <video
               src="/introductory/gpt_response.mp4"
-              className="w-[30vw] h-[40vh] absolute z-10 rounded-2xl object-cover mb-6"
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2/3 md:w-13/20 rounded-lg shadow-lg"
               draggable={false}
               autoPlay
               muted

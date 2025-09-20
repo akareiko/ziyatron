@@ -18,12 +18,14 @@ export default LayoutGridDemo;
 const SkeletonOne = () => (
   <div>
     <p className="font-bold md:text-4xl text-xl text-white font-sans">
-      Точность диагностики
+      Diagnostic Accuracy
     </p>
     <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-      Ziyatron демонстрирует точность до 99.55%, чувствительность 98.68% и
-      специфичность 99.81%. Эти показатели подтверждают её надёжность в выявлении
-      эпилептических припадков по ЭЭГ-сигналам.
+      Ziyatron achieves an accuracy of up to 99.55%, with sensitivity of 98.68% 
+      and specificity of 99.81%, demonstrating its reliability in detecting 
+      epileptic seizures from EEG signals. The model has been validated on the 
+      CHB-MIT and Temple University EEG Corpora, and its effectiveness has been 
+      confirmed by local practitioners and physicians.
     </p>
   </div>
 );
@@ -31,12 +33,12 @@ const SkeletonOne = () => (
 const SkeletonTwo = () => (
   <div>
     <p className="font-bold md:text-4xl text-xl text-white font-sans">
-      Данные и предобработка
+      Data & Preprocessing
     </p>
     <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-      Система обрабатывает многоканальные ЭЭГ-записи с частотой 256 Гц, удаляет
-      шумы и артефакты, нормализует данные и выделяет информативные участки. Это
-      обеспечивает высокое качество анализа в реальном времени.
+      The system processes multichannel EEG recordings at 256 Hz, removes noise 
+      and artifacts, normalizes the data, and extracts the most informative 
+      segments. This ensures high-quality, real-time analysis.
     </p>
   </div>
 );
@@ -44,12 +46,12 @@ const SkeletonTwo = () => (
 const SkeletonThree = () => (
   <div>
     <p className="font-bold md:text-4xl text-xl text-white font-sans">
-      Эпилепсия и мониторинг
+      Epilepsy & Monitoring
     </p>
     <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-      Ziyatron предназначен для помощи врачам и пациентам: он способен
-      автоматически выявлять припадки, вести мониторинг и интегрироваться в
-      телемедицинские платформы для удалённого наблюдения.
+      Ziyatron is designed to support doctors and specialists by automatically 
+      detecting seizures, enabling continuous monitoring, and integrating with 
+      telemedicine platforms for remote observation.
     </p>
   </div>
 );
@@ -57,34 +59,34 @@ const SkeletonThree = () => (
 const SkeletonFour = () => (
   <div>
     <p className="font-bold md:text-4xl text-xl text-white font-sans">
-      Архитектура и ИИ
+      Architecture & AI
     </p>
     <p className="font-normal text-base my-4 max-w-lg text-neutral-200 font-sans">
-      В основе Ziyatron — мультимасштабные сверточные сети и трансформеры. Такая
-      архитектура позволяет улавливать как локальные особенности, так и глобальные
-      зависимости в ЭЭГ-сигналах, обеспечивая точность и интерпретируемость.
+      At the core of Ziyatron are multi-scale convolutional networks and 
+      transformers. This architecture captures both local features and global 
+      dependencies in EEG signals, ensuring accuracy and interpretability.
     </p>
   </div>
 );
 
 const SkeletonOneHeader = () => (
   <p className="md:text-4xl text-xl text-white font-sans">
-    Точность диагностики
+    Diagnostic Accuracy
   </p>
 )
 const SkeletonTwoHeader = () => (
   <p className="md:text-4xl text-xl text-white font-sans">
-    Данные и предобработка
+    Data & Preprocessing
   </p>
 )
 const SkeletonThreeHeader = () => (
   <p className="md:text-4xl text-xl text-white font-sans">
-    Эпилепсия и мониторинг
+    Epilepsy & Monitoring
   </p>
 )
 const SkeletonFourHeader = () => (
   <p className="md:text-4xl text-xl text-white font-sans">
-    Архитектура и ИИ
+    Architecture & AI
   </p>
 )
 

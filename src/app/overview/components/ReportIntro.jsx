@@ -30,36 +30,36 @@ const ReportIntro = () => {
         {/* Main Title with Gradient Text */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6 leading-none">
           <span className="text-white">
-            AI для анализа ЭЭГ
+            Revolutionizing EEG with AI
           </span>
         </h1>
 
         {/* Subtitle */}
         <p className="text-sm md:text-sm leading-relaxed text-white mb-12 max-w-4xl mx-auto">
-          Инновационная система глубокого обучения для автоматического выявления эпилептических припадков и анализа биоэлектрической активности мозга
+          An innovative deep learning system for automatic detection of epileptic seizures and advanced analysis of brain bioelectrical activity
         </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 items-center">
           <button className="px-4 py-2 text-sm bg-white rounded-full text-black hover:bg-white/90">
-            <span className="relative z-10">Начать использование</span>
+            <span className="relative z-10">Get Started</span>
           </button>
           
           <button className="px-4 py-2 text-sm text-white rounded-full hover:bg-white/10">
-            <span className="relative z-10">Посмотреть демо</span>
+            <span className="relative z-10">Watch Demo</span>
           </button>
         </div>
 
         {/* Stats Pills */}
         <div className="flex flex-wrap justify-center gap-4 mt-12">
           <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-            <span className="text-sm text-slate-300">Точность <span className=" font-semibold">99.55%</span></span>
+            <span className="text-sm text-slate-300">Accuracy <span className=" font-semibold">99.55%</span></span>
           </div>
           <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-            <span className="text-sm text-slate-300">Чувствительность <span className=" font-semibold">98.68%</span></span>
+            <span className="text-sm text-slate-300">Sensitivity <span className=" font-semibold">98.68%</span></span>
           </div>
           <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-            <span className="text-sm text-slate-300">Специфичность <span className=" font-semibold">99.81%</span></span>
+            <span className="text-sm text-slate-300">Specificity <span className=" font-semibold">99.81%</span></span>
           </div>
         </div>
       </div>
@@ -69,12 +69,12 @@ const ReportIntro = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl mb-6 text-white">
-            Обзор проекта
+            Project Overview
           </h2>
           <p className="text-sm leading-relaxed text-white max-w-4xl mx-auto">
-            Ziyatron разработан для автоматизированного анализа электроэнцефалограмм (ЭЭГ) и раннего выявления эпилептических припадков. 
-            Используя новейшие архитектуры глубокого обучения, он помогает врачам быстрее и точнее ставить диагнозы, снижая нагрузку на специалистов 
-            и улучшая качество медицинской помощи.
+            Ziyatron is designed for automated analysis of electroencephalograms (EEG) and early detection of epileptic seizures. 
+            Powered by state-of-the-art deep learning architectures, it helps doctors deliver faster and more accurate diagnoses, 
+            reduces the workload on specialists, and enhances the quality of patient care.
           </p>
         </div>
       </div>
