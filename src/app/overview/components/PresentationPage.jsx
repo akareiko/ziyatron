@@ -46,10 +46,7 @@ const PresentationPage = () => {
       </section>
 
       {/* Data Collection Section */}
-      <section
-        id="datacollection"
-        className="relative flex flex-col md:flex-row overflow-hidden items-center justify-center h-screen p-8 m-5 rounded-xl bg-[#111111] border border-white/20 text-white"
-      >
+      <section id="datacollection" className="relative flex flex-col md:flex-row overflow-hidden items-center justify-center h-screen p-8 m-5 rounded-xl bg-[#111111] border border-white/20 text-white">
         <div className="md:w-1/2 relative flex justify-center items-center">
           {/* Background frame image */}
           <Image
@@ -128,7 +125,6 @@ const PresentationPage = () => {
       </section>
 
       {/* Visualization Section */}
-
       <section id="visua" className="relative flex flex-col md:flex-row items-center justify-center h-screen p-8 bg-black text-white">
         <div className="md:w-1/2 p-6">
           <h2 className="text-3xl font-bold mb-4">Interpretation & Visualization</h2>
@@ -154,6 +150,30 @@ const PresentationPage = () => {
               loop
               playsInline
             />
+        </div>
+      </section>
+      
+      {/*	Overview & Navigation */}
+      <section id="overview" className="relative flex flex-col md:flex-row items-center justify-center m-5 rounded-xl bg-[#111111] border border-white/20 text-white h-screen p-8">
+        <div className="md:w-1/2 relative flex justify-center items-center">
+          <Image
+            src={baground4}
+            alt=""
+            className="absolute w-[35vw] h-auto rounded-xl object-cover"
+            draggable={false}
+            />
+          <Image
+            src={main_page}
+            alt="Overview & Navigation"
+            className="w-[30vw] h-auto absolute z-10 rounded-2xl object-fill"
+            draggable={false}
+          />
+        </div>
+        <div className="md:w-1/2 p-6">
+          <h2 className="text-3xl font-bold mb-4">Overview & Navigation</h2>
+          <p className="text-lg">
+            The Ziyatron main page displays all patients in a clear grid with names and key information. Doctors can quickly open chats for each patient and create new profiles directly from the page, streamlining workflow and access.
+          </p>
         </div>
       </section>
     </div>

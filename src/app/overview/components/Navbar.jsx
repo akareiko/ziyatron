@@ -28,11 +28,21 @@ const Logo = () => (
 );
 
 // Menu Item Component
-const MenuItem = ({ setActive, active, item, children, href }) => {
+const MenuItem = ({ setActive, active, item, children, href, setActiveSection }) => {
   const handleMouseEnter = useCallback(() => setActive(item), [setActive, item]);
   
+  const handleClick = () => {
+    if (setActiveSection) {
+      setActiveSection(item);
+    }
+    setActive(null);
+  };
+  
   const content = (
-    <p className="cursor-pointer text-neutral-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-white/5">
+    <p
+      className="cursor-pointer text-neutral-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-white/5"
+      onClick={handleClick}
+    >
       {item}
     </p>
   );
@@ -126,7 +136,7 @@ const TryButton = () => {
   );
 };
 
-export default function Navbar() {
+export default function Navbar({ setActiveSection }) {
   const [active, setActive] = useState(null);
   const [mounted, setMounted] = useState(false);
 
@@ -172,7 +182,7 @@ export default function Navbar() {
             {/* Logo Section */}
             <div className="flex-shrink-0">
               <Link 
-                href="/" 
+                href="/overview" 
                 className="flex items-center space-x-2 group"
                 aria-label="Ziyatron Home"
               >
@@ -188,35 +198,39 @@ export default function Navbar() {
             {/* Center Navigation - Hidden on mobile, visible on md+ */}
             <div className="hidden md:flex flex-1 justify-center">
               <Menu setActive={setActive}>
-                <MenuItem 
-                  setActive={setActive} 
-                  active={active} 
-                  item="About" 
-                  href="/about" 
+                <MenuItem
+                  setActive={setActive}
+                  active={active}
+                  item="About"
+                  setActiveSection={setActiveSection}
                 />
-                
-                <MenuItem setActive={setActive} active={active} item="Learn">
-                  <div className="flex flex-col space-y-3 text-sm min-w-[160px]">
+                <MenuItem
+                  setActive={setActive}
+                  active={active}
+                  item="Learn"
+                  setActiveSection={setActiveSection}
+                >
+                  {/* <div className="flex flex-col space-y-3 text-sm min-w-[160px]">
                     <HoveredLink href="/upload">Upload</HoveredLink>
                     <HoveredLink href="/visualize">Visualize</HoveredLink>
-                  </div>
+                  </div> */}
                 </MenuItem>
                 
                 <MenuItem setActive={setActive} active={active} item="For Business">
-                  <div className="flex flex-col space-y-3 text-sm min-w-[180px]">
+                  {/* <div className="flex flex-col space-y-3 text-sm min-w-[180px]">
                     <HoveredLink href="/learn#introduction">Begin</HoveredLink>
                     <HoveredLink href="/learn#webdev">Web Development</HoveredLink>
                     <HoveredLink href="/learn#dataprep">Data Preprocessing</HoveredLink>
                     <HoveredLink href="/learn#modelbuild">Model Building</HoveredLink>
                     <HoveredLink href="/learn#visualization">Visualization</HoveredLink>
-                  </div>
+                  </div> */}
                 </MenuItem>
                 
                 <MenuItem 
                   setActive={setActive} 
                   active={active} 
                   item="Download" 
-                  href="/download" 
+                  // href="/download" 
                 />
               </Menu>
             </div>
