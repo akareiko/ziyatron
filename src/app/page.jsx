@@ -1,13 +1,19 @@
 'use client';
-import { useAuth } from "../context/AuthContext";
-import LayoutWrapper from "../components/LayoutWrapper";
-import LandingPage from "../components/LandingPage"; // TODO: Delete
-import OverviewPage from "./overview/page";
 
-// ---------------------
-// Main Page Component
-export default function Page() {
+import { useAuth } from "../context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import LayoutWrapper from "../components/LayoutWrapper";
+
+export default function DashboardPage() {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [user, loading, router]);
 
   if (loading)
     return (
@@ -18,7 +24,5 @@ export default function Page() {
 
   if (user) return <LayoutWrapper />;
 
-  return (
-    <OverviewPage />
-  );
+  return null;
 }
