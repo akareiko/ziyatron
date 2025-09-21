@@ -146,38 +146,21 @@ export function ChatProvider({ children }) {
     });
   }, []);
 
-  // Text processing functions (improved)
-  function sanitizeDeltaForMarkdown(currentText, delta) {
-    if (!delta) return delta;
-
-    // Remove problematic characters
-    delta = delta.replace(/[\u200B\uFEFF]/g, '').replace(/\u00A0/g, ' ');
-
-    // Handle markdown structure
-    if (/^\s*(#{1,6}\s+|- |\* |\d+\.\s+|> )/.test(delta) &&
-      currentText && !currentText.endsWith('\n')) {
-      delta = '\n' + delta.trimStart();
-    }
-
-    delta = delta.replace(/(?<!\n)\s+(?=(#{1,6}\s+|- |\* |\d+\.\s+|> ))/g, '\n');
-    return delta;
-  }
 
   function appendDeltaSafe(currentText, delta) {
     if (!delta) return currentText;
 
-    const sanitized = sanitizeDeltaForMarkdown(currentText, delta);
     let overlap = 0;
-    const maxOverlap = Math.min(currentText.length, sanitized.length);
+    const maxOverlap = Math.min(currentText.length, delta.length);
 
     for (let i = maxOverlap; i > 0; i--) {
-      if (currentText.endsWith(sanitized.slice(0, i))) {
+      if (currentText.endsWith(delta.slice(0, i))) {
         overlap = i;
         break;
       }
     }
 
-    return currentText + sanitized.slice(overlap);
+    return currentText + delta.slice(overlap);
   }
 
   // Load chat history with error handling
