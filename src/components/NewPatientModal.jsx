@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { addPatient } from "../lib/api";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 
 export default function NewPatientModal({ isOpen, onClose, onNewPatientAdded }) {
   const [name, setName] = useState("");
@@ -10,6 +11,7 @@ export default function NewPatientModal({ isOpen, onClose, onNewPatientAdded }) 
   const [visible, setVisible] = useState(isOpen);
   const modalRef = useRef(null);
   const router = useRouter();
+  const { token } = useAuth();
 
   // Open/close modal based on isOpen prop
   useEffect(() => {
@@ -45,7 +47,6 @@ export default function NewPatientModal({ isOpen, onClose, onNewPatientAdded }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
     if (!token) {
       setStatus("No auth token found.");
       return;
