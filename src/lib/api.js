@@ -51,16 +51,6 @@ export async function authFetch(url, token, options = {}) {
 }
 
 /* ------------------------
-   Chat endpoints
------------------------- */
-export function sendEphemeralMessage(message) {
-  return request("/anon-chat", {
-    method: "POST",
-    body: JSON.stringify({ session_id: "ephemeral", message }),
-  });
-}
-
-/* ------------------------
    Patients API
 ------------------------ */
 export async function getPatients(token) {
