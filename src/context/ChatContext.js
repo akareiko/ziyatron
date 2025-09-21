@@ -1,13 +1,13 @@
 'use client';
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "./AuthContext";
-import { io } from "socket.io-client";
 
 const ChatContext = createContext();
 
 // Constants for configuration
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://127.0.0.1:5001";
-const DELTA_PROCESS_INTERVAL = 0;
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
+console.log(SOCKET_URL);
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_DELAY = 1000;
 
@@ -18,173 +18,132 @@ export function ChatProvider({ children }) {
   const [error, setError] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
-  
-  // Refs for socket and processing
-  const socketRef = useRef(null);
+
+  // Refs for WebSocket and processing
+  const wsRef = useRef(null);
   const currentPatientIdRef = useRef(null);
-  const deltaQueueRef = useRef([]);
-  const processingIntervalRef = useRef(null);
+  const currentSessionIdRef = useRef(null);
   const retryCountRef = useRef(0);
-  const isCleaningUpRef = useRef(false);
+  const reconnectTimeoutRef = useRef(null);
 
   // Cleanup function
   const cleanup = useCallback(() => {
-    isCleaningUpRef.current = true;
-    
-    // Clear processing interval
-    if (processingIntervalRef.current) {
-      clearInterval(processingIntervalRef.current);
-      processingIntervalRef.current = null;
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
-    
-    // Clear delta queue
-    deltaQueueRef.current = [];
-    
-    // Disconnect socket
-    if (socketRef.current) {
-      socketRef.current.removeAllListeners();
-      socketRef.current.disconnect();
-      socketRef.current = null;
+
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
     }
-    
+
     setIsStreaming(false);
     setConnectionStatus('disconnected');
   }, []);
 
-  // Socket connection with retry logic
-  const connectSocket = useCallback(async () => {
-    if (authLoading || !token || socketRef.current?.connected) return;
-    
-    try {
-      const socket = io(SOCKET_URL, {
-        auth: { token },
-        transports: ["websocket"],
-        timeout: 10000,
-        reconnection: true,
-        reconnectionAttempts: MAX_RETRY_ATTEMPTS,
-        reconnectionDelay: RETRY_DELAY,
-      });
+  // WebSocket connection with retry logic
+  const connectWebSocket = useCallback((sessionId) => {
+    if (authLoading || !token || !sessionId) return;
 
-      // Connection events
-      socket.on("connect", () => {
-        console.log("Socket connected");
+    try {
+      const wsUrl = `${SOCKET_URL}/ws/${sessionId}`;
+      const ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log("WebSocket connected");
         setConnectionStatus('connected');
         retryCountRef.current = 0;
-      });
 
-      socket.on("disconnect", (reason) => {
-        console.log("Socket disconnected:", reason);
+        // Send join message
+        ws.send(JSON.stringify({ type: "join" }));
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.status) {
+            console.log("WebSocket status:", data.status);
+            return;
+          }
+
+          if (data.assistant_update) {
+            handleAssistantUpdate(data.assistant_update);
+          }
+
+          if (data.stream_complete) {
+            setIsStreaming(false);
+            currentPatientIdRef.current = null;
+            currentSessionIdRef.current = null;
+          }
+
+        } catch (err) {
+          console.error("Failed to parse WebSocket message:", err);
+        }
+      };
+
+      ws.onclose = (event) => {
+        console.log("WebSocket closed:", event.code, event.reason);
         setConnectionStatus('disconnected');
         setIsStreaming(false);
-      });
 
-      socket.on("connect_error", (err) => {
-        console.error("Socket connect error:", err);
+        // Auto-reconnect logic
+        if (!event.wasClean && retryCountRef.current < MAX_RETRY_ATTEMPTS) {
+          retryCountRef.current++;
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (currentSessionIdRef.current) {
+              connectWebSocket(currentSessionIdRef.current);
+            }
+          }, RETRY_DELAY * retryCountRef.current);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
         setConnectionStatus('error');
-        retryCountRef.current++;
-        
+
         if (retryCountRef.current >= MAX_RETRY_ATTEMPTS) {
           setError("Failed to connect to chat service. Please refresh the page.");
         }
-      });
+      };
 
-      // Assistant streaming events
-      socket.on("assistant_update", (chunk) => {
-  const patientId = currentPatientIdRef.current;
-  const delta = chunk.text_delta || "";
-  if (!patientId || !delta) return;
+      wsRef.current = ws;
 
-  setIsStreaming(true);
-  setMessagesByPatient(prev => {
-    const updated = [...(prev[patientId] || [])];
-    let msg;
-    
-    if (!updated.length || updated[updated.length - 1].role !== "assistant") {
-      msg = { role: "assistant", content: { text: "" }, timestamp: new Date().toISOString(), id: `msg_${Date.now()}_${Math.random()}` };
-      updated.push(msg);
-    } else {
-      msg = updated[updated.length - 1];
-    }
-
-    msg.content.text = appendDeltaSafe(msg.content.text, delta);
-    return { ...prev, [patientId]: updated };
-  });
-});
-
-      socket.on("stream_complete", () => {
-        setIsStreaming(false);
-        currentPatientIdRef.current = null;
-      });
-
-      socket.on("stream_error", (error) => {
-        console.error("Stream error:", error);
-        setIsStreaming(false);
-        setError("Streaming error occurred. Please try again.");
-      });
-
-      socketRef.current = socket;
-      
     } catch (err) {
-      console.error("Failed to create socket connection:", err);
+      console.error("Failed to create WebSocket connection:", err);
       setConnectionStatus('error');
     }
   }, [authLoading, token]);
 
-  // Delta processing with proper cleanup
-  useEffect(() => {
-    if (isCleaningUpRef.current) return;
-    
-    processingIntervalRef.current = setInterval(() => {
-      if (deltaQueueRef.current.length === 0) {
-        if (isStreaming && currentPatientIdRef.current === null) {
-          setIsStreaming(false);
-        }
-        return;
+  // Handle assistant update messages
+  const handleAssistantUpdate = useCallback((update) => {
+    const patientId = currentPatientIdRef.current;
+    const delta = update.text_delta || "";
+
+    if (!patientId || !delta) return;
+
+    setIsStreaming(true);
+    setMessagesByPatient(prev => {
+      const updated = [...(prev[patientId] || [])];
+      let msg;
+
+      if (!updated.length || updated[updated.length - 1].role !== "assistant") {
+        msg = {
+          role: "assistant",
+          content: { text: "" },
+          timestamp: new Date().toISOString(),
+          id: `msg_${Date.now()}_${Math.random()}`
+        };
+        updated.push(msg);
+      } else {
+        msg = updated[updated.length - 1];
       }
 
-      setIsStreaming(true);
-      const { patientId, text } = deltaQueueRef.current.shift();
-
-      setMessagesByPatient(prev => {
-        const updated = [...(prev[patientId] || [])];
-        let msg;
-        
-        if (!updated.length || updated[updated.length - 1].role !== "assistant") {
-          msg = { 
-            role: "assistant", 
-            content: { text: "" },
-            timestamp: new Date().toISOString(),
-            id: `msg_${Date.now()}_${Math.random()}`
-          };
-          updated.push(msg);
-        } else {
-          msg = updated[updated.length - 1];
-        }
-
-        msg.content.text = appendDeltaSafe(msg.content.text, text);
-        return { ...prev, [patientId]: updated };
-      });
-    }, DELTA_PROCESS_INTERVAL);
-
-    return () => {
-      if (processingIntervalRef.current) {
-        clearInterval(processingIntervalRef.current);
-        processingIntervalRef.current = null;
-      }
-    };
-  }, [isStreaming]);
-
-  // Initialize socket connection
-  useEffect(() => {
-    connectSocket();
-    
-    return cleanup;
-  }, [connectSocket, cleanup]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return cleanup;
-  }, [cleanup]);
+      msg.content.text = appendDeltaSafe(msg.content.text, delta);
+      return { ...prev, [patientId]: updated };
+    });
+  }, []);
 
   // Text processing functions (improved)
   function sanitizeDeltaForMarkdown(currentText, delta) {
@@ -194,8 +153,8 @@ export function ChatProvider({ children }) {
     delta = delta.replace(/[\u200B\uFEFF]/g, '').replace(/\u00A0/g, ' ');
 
     // Handle markdown structure
-    if (/^\s*(#{1,6}\s+|- |\* |\d+\.\s+|> )/.test(delta) && 
-        currentText && !currentText.endsWith('\n')) {
+    if (/^\s*(#{1,6}\s+|- |\* |\d+\.\s+|> )/.test(delta) &&
+      currentText && !currentText.endsWith('\n')) {
       delta = '\n' + delta.trimStart();
     }
 
@@ -223,21 +182,33 @@ export function ChatProvider({ children }) {
   // Load chat history with error handling
   const loadHistory = useCallback(async (patientId) => {
     if (!patientId || messagesByPatient[patientId] || loading) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
-      const data = await authFetch(`${SOCKET_URL}/chat-history/${patientId}`);
+      const response = await fetch(`${API_URL}/chat-history/${patientId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to load chat history');
+      }
+
+      const data = await response.json();
       const messagesWithIds = (data || []).map(msg => ({
         ...msg,
         id: msg.id || `msg_${Date.now()}_${Math.random()}`,
         timestamp: msg.timestamp || new Date().toISOString()
       }));
-      
-      setMessagesByPatient(prev => ({ 
-        ...prev, 
-        [patientId]: messagesWithIds 
+
+      setMessagesByPatient(prev => ({
+        ...prev,
+        [patientId]: messagesWithIds
       }));
     } catch (err) {
       console.error("Failed to fetch chat history", err);
@@ -245,14 +216,11 @@ export function ChatProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [authFetch, messagesByPatient, loading]);
+  }, [token, messagesByPatient, loading]);
 
   // Send message with improved error handling
   const sendMessage = useCallback(async (patientId, { message, file_url, file_name }) => {
-    if (!patientId || (!message?.trim() && !file_url) || !socketRef.current?.connected) {
-      if (!socketRef.current?.connected) {
-        setError("Connection lost. Please refresh the page.");
-      }
+    if (!patientId || (!message?.trim() && !file_url)) {
       return;
     }
 
@@ -274,37 +242,57 @@ export function ChatProvider({ children }) {
     }));
 
     try {
-      const data = await authFetch(`${SOCKET_URL}/chat/${patientId}`, {
+      // Step 1: Send message to FastAPI backend
+      const response = await fetch(`${API_URL}/chat/${patientId}`, {
         method: "POST",
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ message, file_url, file_name }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to send message');
+      }
+
+      const data = await response.json();
+
       const { session_id, eeg_summary } = data;
+      currentSessionIdRef.current = session_id;
 
-      // Join session and start streaming
-      socketRef.current.emit("join", { session_id });
-      socketRef.current.emit("start_assistant", {
-        patient_id: patientId,
-        session_id,
-        message,
-        eeg_summary,
-        token,
-      });
+      // Step 2: Connect WebSocket for this session
+      connectWebSocket(session_id);
 
-      setIsStreaming(true);
+      // Step 3: Wait a moment for connection, then start assistant
+      setTimeout(() => {
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            type: "start_assistant",
+            token: `Bearer ${token}`,
+            patient_id: patientId,
+            session_id,
+            message,
+            eeg_summary
+          }));
+          setIsStreaming(true);
+        } else {
+          setError("Failed to establish WebSocket connection");
+        }
+      }, 100);
 
     } catch (err) {
       console.error("Failed to send message", err);
       setError("Failed to send message. Please try again.");
-      
+
       // Remove optimistic message on error
       setMessagesByPatient(prev => ({
         ...prev,
         [patientId]: (prev[patientId] || []).filter(msg => msg.id !== userMessage.id),
       }));
     }
-  }, [authFetch, token]);
+  }, [authFetch, token, connectWebSocket]);
 
   // Clear messages for a patient (memory management)
   const clearPatientMessages = useCallback((patientId) => {
@@ -319,8 +307,15 @@ export function ChatProvider({ children }) {
   const retryConnection = useCallback(() => {
     cleanup();
     retryCountRef.current = 0;
-    setTimeout(connectSocket, 1000);
-  }, [cleanup, connectSocket]);
+    if (currentSessionIdRef.current) {
+      setTimeout(() => connectWebSocket(currentSessionIdRef.current), 1000);
+    }
+  }, [cleanup, connectWebSocket]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return cleanup;
+  }, [cleanup]);
 
   if (authLoading) return null;
 
