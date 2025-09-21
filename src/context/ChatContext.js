@@ -48,7 +48,7 @@ export function ChatProvider({ children }) {
     if (authLoading || !token || !sessionId) return;
 
     try {
-      const wsUrl = `${SOCKET_URL}/ws/${sessionId}`;
+      const wsUrl = `${SOCKET_URL}/${sessionId}`;
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
@@ -255,7 +255,7 @@ export function ChatProvider({ children }) {
         } else {
           setError("Failed to establish WebSocket connection");
         }
-      }, 100);
+      }, 2000);
 
     } catch (err) {
       console.error("Failed to send message", err);
