@@ -83,3 +83,17 @@ export async function addPatient({ name, age, condition }, token) {
     body: JSON.stringify({ name, age, condition }),
   });
 }
+
+/* ------------------------
+   Chat endpoints
+------------------------ */
+export async function getChatHistory(patientId, token) {
+  return authFetch(`${API_URL}/chat-history/${patientId}`, token);
+}
+
+export async function sendChatMessage(patientId, { message, file_url, file_name }, token) {
+  return authFetch(`${API_URL}/chat/${patientId}`, token, {
+    method: "POST",
+    body: JSON.stringify({ message, file_url, file_name }),
+  });
+}

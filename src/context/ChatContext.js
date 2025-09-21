@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "./AuthContext";
+import { getChatHistory, sendChatMessage } from "../lib/api";
 
 const ChatContext = createContext();
 
@@ -187,19 +188,7 @@ export function ChatProvider({ children }) {
     setError(null);
 
     try {
-      const response = await fetch(`${API_URL}/chat-history/${patientId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to load chat history');
-      }
-
-      const data = await response.json();
+      const data = await getChatHistory(patientId, token);
       const messagesWithIds = (data || []).map(msg => ({
         ...msg,
         id: msg.id || `msg_${Date.now()}_${Math.random()}`,
@@ -243,21 +232,7 @@ export function ChatProvider({ children }) {
 
     try {
       // Step 1: Send message to FastAPI backend
-      const response = await fetch(`${API_URL}/chat/${patientId}`, {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ message, file_url, file_name }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to send message');
-      }
-
-      const data = await response.json();
+      const data = await sendChatMessage(patientId, { message, file_url, file_name }, token);
 
       const { session_id, eeg_summary } = data;
       currentSessionIdRef.current = session_id;
