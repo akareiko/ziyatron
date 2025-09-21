@@ -4,11 +4,13 @@ import { createPortal } from "react-dom";
 import { useAuth } from "../context/AuthContext";
 import clsx from "clsx";
 import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
+import { useRouter } from "next/navigation";
 
 export default function SidebarAccount({ collapsed }) {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const router = useRouter();
 
   const { refs, floatingStyles } = useFloating({
     open,
@@ -20,7 +22,7 @@ export default function SidebarAccount({ collapsed }) {
 
   const handleLogout = () => {
     logout();
-    window.location.href = "http://localhost:3000";
+    router.replace("/login");
   };
 
   const initial = ((user?.name || user?.email || "U")[0] || "U").toUpperCase();

@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import NewPatientModal from "./NewPatientModal";
 import BlurEffect from "react-progressive-blur";
+import { useRouter } from "next/navigation";
 
 // ----------------------------
 // LayoutWrapper
@@ -22,7 +23,7 @@ export default function LayoutWrapper({ children }) {
   const [patients, setPatients] = useState([]);
   const handleGlobalFileDrop = (file) => setExternalFile(file);
   const clearExternalFile = () => setExternalFile(null);
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, loading } = useAuth();
   const [error, setError] = useState("");
   const [newPatientId, setNewPatientId] = useState(null);
   const [rightExpanded, setRightExpanded] = useState(false);
@@ -30,6 +31,15 @@ export default function LayoutWrapper({ children }) {
   setPatients((prev) => [newPatient, ...prev]); // prepend new patient
   setNewPatientId(newPatient.id);
 };
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) return null;
 
   // ---------------------
   // Fetch patients securely
