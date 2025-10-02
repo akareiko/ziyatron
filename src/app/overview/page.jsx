@@ -7,6 +7,7 @@ import LayoutGridDemo from "./components/LayoutGridDemo";
 import ReportIntro from "./components/ReportIntro"
 import PresentationPage from "./components/PresentationPage"
 import Navbar from "./components/Navbar"
+import ContactPage from "./components/ContactPage"
 
 export default function OverviewPage() {
   // State to track which menu is active
@@ -23,6 +24,7 @@ export default function OverviewPage() {
           <Scroll />
           <ReportIntro />
           <LayoutGridDemo />
+          <ContactPage />
         </>
       )}
 
