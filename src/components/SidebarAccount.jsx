@@ -88,7 +88,7 @@ export default function SidebarAccount({ collapsed }) {
           <span
             className={clsx(
               "ml-2 transition-all duration-200 truncate",
-              collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+              collapsed ? "w-0 opacity-0 overflow-hidden pointer-events-none" : "w-auto opacity-100"
             )}
           >
             {user?.name || user?.email}

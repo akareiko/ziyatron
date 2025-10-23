@@ -20,7 +20,7 @@ export default function ChatHeader({ patientName, rightExpanded, setRightExpande
   return (
     <div className="flex items-center justify-between pb-2">
       <span className="flex flex-row items-center">
-        <button className="py-2 px-4 rounded-3xl hover:bg-gray-200/80 bg-white/80 shadow-lg border border-white/90 transition flex flex-row"
+        <button className="py-2 px-4 rounded-3xl backdrop-blur-xs hover:bg-gray-200/80 bg-white/50 shadow-lg border border-white/90 transition flex flex-row"
               aria-label="Share patient link">
           <h2 className="font-light text-black">{patientName}</h2>
         </button>
@@ -28,7 +28,7 @@ export default function ChatHeader({ patientName, rightExpanded, setRightExpande
       {patientId && (
         <div className="flex items-center gap-3 text-sm">
           <button
-            className="py-2 px-4 rounded-3xl hover:bg-gray-200/80 bg-white/80 border border-white/90 shadow-lg transition flex flex-row"
+            className="py-2 px-4 rounded-3xl backdrop-blur-xs hover:bg-gray-200/80 bg-white/50 border border-white/90 shadow-lg transition flex flex-row"
             aria-label="Share patient link"
             onClick={handleShare}
           >
@@ -40,7 +40,7 @@ export default function ChatHeader({ patientName, rightExpanded, setRightExpande
           <MoreOptionsDropdown patient={patientId} />
           <button
             onClick={() => setRightExpanded(!rightExpanded)}
-            className="p-2 rounded-3xl hover:bg-gray-200/80 bg-white/80 border border-white/90 shadow-lg transition"
+            className="p-2 rounded-3xl backdrop-blur-xs hover:bg-gray-200/80 bg-white/50 border border-white/90 shadow-lg transition"
             aria-label={rightExpanded ? "Collapse patient info" : "Expand patient info"}
           >
             {rightExpanded ? (

@@ -74,15 +74,14 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, pa
     <>
       <aside
         role="navigation"
-        className="top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-xl bg-white/70 backdrop-blur-2xl border border-white/80"
-        // className="top-0 left-0 z-40 h-screen pt-4 flex flex-col justify-between transition-all ease-out duration-300 sm:translate-x-0 -translate-x-full overflow-x-hidden rounded-3xl p-6 m-4 shadow-lg bg-white/10 backdrop-blur-2xl border border-gray-300"
+        className="top-0 left-0 z-40 h-screen flex flex-col transition-all ease-out duration-300 overflow-x-hidden rounded-3xl m-4 pl-4"
         aria-label="Sidebar"
       >
         <div className="h-full text-sm flex flex-col overflow-hidden">
           {/* Header + Menu */}
           <div
             className={clsx(
-              "flex-shrink-0 px-2 overflow-hidden pb-4 pt-1 transition-colors duration-300",
+              "flex-shrink-0 overflow-hidden transition-colors duration-300",
               collapsed
                 ? "border-transparent"
                 : showBorder
@@ -95,45 +94,42 @@ export default function Sidebar({ collapsed, setCollapsed, onNewPatientClick, pa
               setCollapsed={setCollapsed}
               scrollContainerRef={scrollContainerRef}
             />
-
-            <div className="flex flex-col">
-              <SidebarItem
-                icon={
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
-                  </svg>
-                }
-                label="New patient"
-                collapsed={collapsed}
-                onClick={onNewPatientClick}
-                aria-label="Add new patient"
-              />
-              <SidebarItem
-                icon={
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93ZM320-320v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T663-540L443-320H320Zm300-263-37-37 37 37ZM380-380h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
-                  </svg>
-                }
-                label="Search chats"
-                collapsed={collapsed}
-                onClick={() => setShowSearch(true)}
-                aria-label="Search chats"
-              />
-            </div>
+            <SidebarItem
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                </svg>
+              }
+              label="New patient"
+              collapsed={collapsed}
+              onClick={onNewPatientClick}
+              aria-label="Add new patient"
+            />
+            <SidebarItem
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93ZM320-320v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T663-540L443-320H320Zm300-263-37-37 37 37ZM380-380h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+                </svg>
+              }
+              label="Search chats"
+              collapsed={collapsed}
+              onClick={() => setShowSearch(true)}
+              aria-label="Search chats"
+            />
           </div>
 
           {/* Patient List */}

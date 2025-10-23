@@ -106,7 +106,7 @@ export default function LayoutWrapper({ children }) {
         </div>
 
         {/* Sidebar */}
-        <div className={`transition-all duration-300 ${collapsed ? "w-[9%]" : "w-[20%]"} flex flex-col h-full`}>
+        <div className={`transition-all duration-300 flex-none ${collapsed ? "w-[130px]" : "w-[280px]"} flex flex-col h-full`}>
           <Sidebar
             collapsed={collapsed}
             setCollapsed={setCollapsed}
@@ -124,7 +124,7 @@ export default function LayoutWrapper({ children }) {
         </div>
 
         {/* Right panel */}
-        <div className={`transition-all duration-300 ${collapsed ? "w-[91%]" : "w-[80%]"} flex flex-col h-full`}>
+        <div className={`transition-all flex-1 duration-300 flex flex-col h-full`}>
           <RightPanel 
             patientId={patientId} 
             externalFile={externalFile} 

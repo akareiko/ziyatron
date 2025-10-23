@@ -10,15 +10,14 @@ function SidebarItem ({ icon, label, collapsed, onClick, selected }) {
                 role="button"
                 tabIndex={0}
                 className={clsx(
-                "flex items-center p-2 rounded-xl text-black cursor-pointer transition-colors duration-200 hover:bg-black/5 w-full",
-                selected && "bg-white/40 shadow"
+                "flex items-center p-2 rounded-xl text-black cursor-pointer transition-colors duration-200 hover:bg-black/5 w-full"
                 )}
             >
                 <span className="w-5 h-5 flex justify-center items-center flex-shrink-0">{icon}</span>
                 <span
                 className={clsx(
                     "whitespace-nowrap overflow-hidden transition-all duration-200 ml-2",
-                    collapsed ? "w-0 opacity-0 pointer-events-none" : "opacity-100"
+                    collapsed ? "w-0 opacity-0 overflow-hidden pointer-events-none" : "opacity-100 w-auto"
                 )}
                 >
                     {label}

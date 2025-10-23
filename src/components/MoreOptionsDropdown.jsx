@@ -31,7 +31,7 @@ export default function MoreOptionsDropdown({ patient = null }) {
       <button
         ref={refs.setReference}
         onClick={() => setOpenMenu((o) => !o)}
-        className="p-2 rounded-3xl hover:bg-gray-200/80 bg-white/80 border border-white/90 shadow-lg transition"
+        className="p-2 rounded-3xl backdrop-blur-xs hover:bg-gray-200/80 bg-white/50 border border-white/90 shadow-lg transition"
         aria-label="More options"
       >
         <svg
