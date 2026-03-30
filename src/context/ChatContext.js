@@ -224,21 +224,30 @@ export function ChatProvider({ children }) {
       connectWebSocket(session_id);
 
       // Step 3: Wait a moment for connection, then start assistant
-      setTimeout(() => {
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({
-            type: "start_assistant",
-            token: `Bearer ${token}`,
-            patient_id: patientId,
-            session_id,
-            message,
-            eeg_summary
-          }));
+      const sendStartAssistant = () => {
+        const payload = JSON.stringify({
+          type: "start_assistant",
+          token: `Bearer ${token}`,
+          patient_id: patientId,
+          session_id,
+          message,
+          eeg_summary
+        });
+
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          wsRef.current.send(payload);
           setIsStreaming(true);
+        } else if (wsRef.current) {
+          wsRef.current.addEventListener("open", () => {
+            wsRef.current.send(payload);
+            setIsStreaming(true);
+          }, { once: true });
         } else {
           setError("Failed to establish WebSocket connection");
         }
-      }, 2000);
+      };
+
+      sendStartAssistant();
 
     } catch (err) {
       console.error("Failed to send message", err);
