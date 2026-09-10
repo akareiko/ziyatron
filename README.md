@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Ziyatron
 
-## Getting Started
+A clinical dashboard for reviewing patient EEG data through a chat interface. Clinicians pick a patient, ask questions in natural language, and get answers grounded in that patient's EEG recordings — classified by a machine learning model running on the companion [`ziyatron-server`](https://github.com/akareiko/ziyatron-server) backend.
 
-First, run the development server:
+This is the frontend: patient list and search, a per-patient chat thread, file upload/drag-and-drop for EEG recordings, and account/auth handling.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+- **Next.js** (App Router) + React 19
+- **Firebase** for auth and storage
+- **Socket.IO client** for realtime updates
+- Tailwind CSS, Framer Motion, Spline for UI/interaction
+
+## How it fits together
+
+```
+ziyatron (this repo)  ──HTTP/WS──>  ziyatron-server
+     Next.js UI                     FastAPI + ONNX EEG model
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The frontend talks to the backend over a REST API defined by `NEXT_PUBLIC_API_URL` (see `src/lib/api.js`) for auth, patient data, and chat, plus a socket connection for live updates.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Running locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+# create .env.local with NEXT_PUBLIC_API_URL and your Firebase web config
+npm run dev
+```
 
-## Learn More
+Needs [`ziyatron-server`](https://github.com/akareiko/ziyatron-server) running (or a deployed instance) for anything beyond the login screen to work.
 
-To learn more about Next.js, take a look at the following resources:
+## Status
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Active development project — patient list, chat, and auth flows are functional; not deployed for real clinical use.
